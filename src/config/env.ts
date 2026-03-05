@@ -2,11 +2,11 @@ import 'dotenv/config'
 import z from 'zod'
 
 const envSchema = z.object({
-    DATABASE_URL:z.string().default("postgresql://postgres:Tripathy014@@localhost:5432/email_agent_db?schema=public"),
+    DATABASE_URL:z.string().default(""),
     DATABASE_HOST:z.string().default("localhost"),
     DATABASE_PORT:z.coerce.number().default(5432),
     DATABASE_USER:z.string().default("postgres"),
-    DATABASE_PASSWORD:z.string().default("Tripathy014@"),
+    DATABASE_PASSWORD:z.string().default(""),
     DATABASE_DATABASE:z.string().default("email_agent_db"),
     APP_PORT:z.coerce.number().default(3000),
     JWT_SECRET:z.string().default("demojwtsecret"),
