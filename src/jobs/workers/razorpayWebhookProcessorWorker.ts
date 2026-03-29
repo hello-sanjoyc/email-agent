@@ -8,6 +8,8 @@ import subscriptionHaltedTemplate from "../../mail/templates/subscriptionHalted.
 import subscriptionCancelledTemplate from "../../mail/templates/subscriptionCancelled.template";
 import subscriptionActivatedTemplate from "../../mail/templates/subscriptionActivated.template";
 import { handleRazorpayActivatedEvent, handleRazorpayCancelledEvent, handleRazorpayChargedEvent, handleRazorpayHaltedEvent } from "../../services/finance.service";
+import razorpay from "../../config/razorpay";
+import env from "../../config/env";
 
 let razorpayWebhookProcessorWorker:Worker<RazorpayJobPayload>|null = null;
 const razorpayWebhookProcessor =async (job:Job<RazorpayJobPayload>):Promise<void> => {
@@ -62,12 +64,13 @@ const razorpayWebhookProcessor =async (job:Job<RazorpayJobPayload>):Promise<void
                 });                
                 break;
             case "subscription.halted":
-                const haltedSubscriptionData = await handleRazorpayHaltedEvent(rzpSubscriptionId);
-                const updateUrl = `${process.env.FRONTEND_URL}/billing`;
+                const rzpSub = (await razorpay.subscriptions.fetch(rzpSubscriptionId));
+                const razorpayBillingUrl = rzpSub.short_url || `${env.FRONTEND_URL}/billings`
+                const haltedSubscriptionData = await handleRazorpayHaltedEvent(rzpSubscriptionId);                
                 await emailSendingQueue.add('email-sending', {
                     to: haltedSubscriptionData.user.email,
                     subject: "Urgent: Your subscription payment failed",
-                    content: subscriptionHaltedTemplate(haltedSubscriptionData.user.name || 'User', haltedSubscriptionData.plan.name, updateUrl)
+                    content: subscriptionHaltedTemplate(haltedSubscriptionData.user.name || 'User', haltedSubscriptionData.plan.name, razorpayBillingUrl)
                 }); 
                 break;
             case "subscription.cancelled":

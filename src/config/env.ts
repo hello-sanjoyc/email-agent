@@ -30,7 +30,9 @@ const envSchema = z.object({
     PROCESS_TYPE:z.string().default(""),
     RAZORPAY_KEY:z.string().default(""),
     RAZORPAY_SECRET:z.string().default(""),
-    FRONTEND_URL:z.string().default("")
+    FRONTEND_URL:z.string().default(""),
+    N8N_WEBHOOK_URL:z.string().default(""),
+    GROQ_API_KEY:z.string().default("")
 });
 
 const env = envSchema.parse(process.env);

@@ -9,7 +9,7 @@ export const initEmailProcessingQueue = () => {
         defaultJobOptions:{
             attempts:3,
             backoff:{type:'exponential',delay:5000},
-            removeOnComplete:100,
+            removeOnComplete:{count:100,age:24 * 3600},
             removeOnFail:500
         }
     });

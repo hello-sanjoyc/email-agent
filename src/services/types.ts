@@ -53,7 +53,7 @@ export interface PassResetTokenData {
 export interface SubscriptionPlanData {
     id:string;
     name:string;
-    monthlyQuota:number;
+    quota:number;
     price:Decimal;
     gatewayPlanId:string|null;
     billingInterval:BillingInterval;
@@ -82,7 +82,7 @@ export interface ActiveSubscriptionPlanData {
     plan: {
         id: string;
         name: string;
-        monthlyQuota: number;
+        quota: number;
         price: Decimal;
         gatewayPlanId:string | null;
         billingInterval:BillingInterval;

@@ -11,6 +11,9 @@ import { initEmailSendingQueue } from './jobs/queues/emailSendingQueue.js';
 import { initEmailProcessingQueue } from './jobs/queues/emailProcessingQueue.js';
 import { initEmailProcessorSchedular } from './jobs/schedulers/emailProcessorScheduler.js';
 import { initRazorpayWebhookProcessingQueue } from './jobs/queues/razorpayWebhookProcessingQueue.js';
+import { initRazorpayWebhookProcessorWorker } from './jobs/workers/razorpayWebhookProcessorWorker.js';
+import { initSubscriptionCleanupQueue } from './jobs/queues/subscriptionCleanupQueue.js';
+import { initSubscriptionCleanupWorker } from './jobs/workers/subscriptionCleanupWorker.js';
 let SERVER:http.Server;
 const PORT = env.APP_PORT || 3003;
 //server starting function
@@ -98,9 +101,12 @@ const startSchedulerProcess = () => {
 const startQueueWorkerProcess = () => {
     //INIT THE BULLMQ INSTANCES
     initEmailSendingQueue(); 
+    initSubscriptionCleanupQueue();
     //INIT THE BULLMQ WORKERS(ALWAYS AFTER CHECKING THE REDIS CONNECTIVITY)
     initEmailProcessorWorker();
     initEmailSenderWorker();
+    initRazorpayWebhookProcessorWorker();
+    initSubscriptionCleanupWorker();
     logger.info(`[QUEUE WORKER PROCESS] started`);
 }
 const bootstrap = async () => {

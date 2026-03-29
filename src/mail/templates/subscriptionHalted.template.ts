@@ -1,7 +1,7 @@
 const subscriptionHaltedTemplate = (
     userName: string, 
     planName: string, 
-    updateUrl: string
+    razorpayBillingUrl: string
 ): string => `
 <!DOCTYPE html>
 <html>
@@ -22,31 +22,34 @@ const subscriptionHaltedTemplate = (
                                 Hi <strong>${userName}</strong>,
                             </p>
                             <p style="color:#555555;line-height:1.6;">
-                                We were unable to process the recurring payment for your <strong>${planName}</strong> subscription after multiple attempts.
+                                We were unable to process the recurring payment for your <strong>${planName}</strong> subscription. To avoid any further interruption to your email automation, a quick update is needed.
                             </p>
                             
                             <div style="background-color:#fff1f2; border-left:4px solid #dc2626; border-radius:4px; padding:16px; margin:24px 0;">
                                 <p style="color:#991b1b; font-size:14px; margin:0;">
-                                    <strong>Status:</strong> Your premium access has been temporarily suspended.
+                                    <strong>Status:</strong> Your automation and premium features are currently paused.
                                 </p>
                             </div>
 
                             <p style="color:#555555;line-height:1.6;">
-                                To restore your services and reset your usage limits, please update your payment method or re-subscribe through your dashboard.
+                                You can restore your service instantly by updating your payment method via our secure billing portal below:
                             </p>
                             
-                            <a href="${updateUrl}" 
+                            <a href="${razorpayBillingUrl}" 
                                style="display:inline-block;padding:12px 24px;
                                       background-color:#dc2626;color:#ffffff;
                                       text-decoration:none;border-radius:6px;
                                       font-weight:bold;margin:16px 0;">
-                                Restore My Subscription
+                                Update Payment & Restore Access
                             </a>
+
+                            <p style="color:#777777; font-size:13px; line-height:1.6;">
+                                Once the payment is successful, your account usage limits will be refreshed and your automation will resume automatically.
+                            </p>
 
                             <hr style="border:none;border-top:1px solid #eeeeee;margin:24px 0;"/>
                             <p style="color:#999999;font-size:12px;">
-                                If you believe this is an error, please check with your bank or contact our support team immediately. 
-                                We want to get you back up and running as soon as possible!
+                                If you have already updated your payment details, please ignore this email. For any other assistance, reply to this email to reach our support team.
                             </p>
                         </td>
                     </tr>

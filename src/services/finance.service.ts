@@ -9,7 +9,7 @@ export const fetchAllSubscriptionPlans = async ():Promise<SubscriptionPlanData[]
             select:{
                 id:true,
                 name:true,
-                monthlyQuota:true,
+                quota:true,
                 price:true,
                 gatewayPlanId:true,
                 billingInterval:true,
@@ -54,7 +54,7 @@ export const fetchActiveSubscriptionPlan = async (userId:string):Promise<ActiveS
                     select:{
                         id:true,
                         name:true,
-                        monthlyQuota:true,
+                        quota:true,
                         price:true,
                         gatewayPlanId:true,
                         billingInterval:true,
@@ -77,7 +77,7 @@ export const fetchSelectedSubscriptionPlan = async (id:string):Promise<Subscript
             select:{
                 id:true,
                 name:true,
-                monthlyQuota:true,
+                quota:true,
                 price:true,
                 gatewayPlanId:true,
                 billingInterval:true,
@@ -131,7 +131,7 @@ export const registerNewSubscriptionPlan = async (apiInput:VerifySubscriptionInp
            });
            //if last active plan present, update the rolled over quota based on that plan's remaining quota
            if(lastActiveSubscription && lastActiveSubscription.plan.billingInterval !=="TRIAL"){
-                rolledOverQuota = Math.max(0,(lastActiveSubscription.plan.monthlyQuota - lastActiveSubscription.currentUsageCount));
+                rolledOverQuota = Math.max(0,(lastActiveSubscription.plan.quota - lastActiveSubscription.currentUsageCount));
                 lastGatewaySubscriptionId = lastActiveSubscription.gatewaySubscriptionId;                
            }          
            //mark all current active subscriptions as is_active false

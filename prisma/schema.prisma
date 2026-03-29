@@ -83,6 +83,7 @@ model EmailAccount {
   imapHost String? @db.VarChar(100) @map("imap_host")
   imapPort Int? @db.Integer @map("imap_port")
   provider String @db.VarChar(80) @default("custom") @map("provider")
+  priorityWeight Int @db.Integer @default(100) @map("priority_weight")
   isActive Boolean @db.Boolean @default(false) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -118,12 +119,14 @@ model SubscriptionPlan {
   name String @db.VarChar(100) @map("name")
   gatewayPlanId String? @db.Text @unique @map("gateway_plan_id")
   billingInterval BillingInterval @map("billing_interval")
-  monthlyQuota Int @db.Integer @map("monthly_quota")
+  quota Int @db.Integer @map("quota")
   price Decimal @db.Decimal(10,2) @map("price")
+  maxEmailsPerRun Int @db.Integer @map("max_emails_per_run")
   gatewayTotalCount Int? @db.Integer @map("gateway_total_count")
   gatewayCustomerNotify Int? @db.Integer @map("gateway_customer_notify")
   createdAt DateTime @default(now()) @map("created_at")
   subscriptions Subscription[]
+  emailActivity EmailActivity[]
   @@map("subscription_plans")
 }
 model Subscription {
@@ -139,6 +142,7 @@ model Subscription {
   user User @relation(fields: [userId],references: [id])
   plan SubscriptionPlan @relation(fields: [planId], references: [id])
   payments Payment[]
+  emailActivity EmailActivity[]
   @@map("subscriptions")
 }
 
@@ -162,14 +166,19 @@ model Payment {
 model EmailActivity {
   id String @db.Uuid @default(uuid()) @id @map("id")
   userId String @db.Uuid @map("user_id")
+  calendarAccountId String @db.Uuid @map("calendar_account_id")
   emailAccountId String @db.Uuid @map("email_account_id")
+  planId String @db.Uuid @map("plan_id")
+  subscriptionId String @db.Uuid @map("subscription_id")
   messageId String @db.Text @map("message_id")
   action String @db.Text @map("action")
   reason String? @db.Text @map("reason")
+  isCompleted Boolean @db.Boolean @map("is_completed")
   processedAt DateTime @default(now()) @map("processed_at")
   user User @relation(fields: [userId], references: [id])
   emailAccount EmailAccount @relation(fields: [emailAccountId],references: [id])
-
+  plan SubscriptionPlan @relation(fields: [planId], references: [id])
+  subscription Subscription @relation(fields: [subscriptionId], references: [id])
   @@map("email_activities")
 }
 
