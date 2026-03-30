@@ -32,7 +32,11 @@ const envSchema = z.object({
     RAZORPAY_SECRET:z.string().default(""),
     FRONTEND_URL:z.string().default(""),
     N8N_WEBHOOK_URL:z.string().default(""),
-    GROQ_API_KEY:z.string().default("")
+    GROQ_API_KEY:z.string().default(""),
+    GROQ_MODEL:z.string().default(""),
+    GEMINI_API_KEY:z.string().default(""),
+    GEMINI_MODEL:z.string().default(""),
+    ACTIVE_AI_PROVIDER:z.string().default("")
 });
 
 const env = envSchema.parse(process.env);

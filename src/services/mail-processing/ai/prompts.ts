@@ -1,9 +1,4 @@
-import Groq from 'groq-sdk'
-import env from '../../config/env'
-import { EmailClassificationOutput } from './types';
-export class AIService{
-    private client = new Groq({apiKey:env.GROQ_API_KEY});
-    private systemPrompt = `You are an email classifier. Analyze the email below and return a single JSON object. No extra text, no markdown, no comments — strictly valid JSON only.
+export const systemPrompt = `You are an email classifier. Analyze the email below and return a single JSON object. No extra text, no markdown, no comments — strictly valid JSON only.
 
 ACTIONS:
 - no_action: informational, promotional, transactional, newsletters, OTPs, receipts — no response needed.
@@ -16,6 +11,7 @@ ACTIONS:
 DATETIME RULES:
 - All datetimes in UTC, time always 00:00:00 (all-day events).
 - End datetime = start datetime + 1 day.
+- The datetime should always be in ISO format.
 - If date is relative (e.g. "this sunday", "next monday", "tomorrow"), resolve it against the email's received date.
 - If no date found, use the email's received date.
 - schedule_meeting and follow_up: start/end datetimes must never be empty.
@@ -47,27 +43,4 @@ OUTPUT SCHEMA:
   "forward_text": ""
 }
 
-Populate action and reason always. Populate only the fields mapped to the chosen action. Leave all other detail fields as empty strings. forward_receiver_email is always an array. Include every key.`;
-    generateUserPrompt(subject:string,date:string,bodySummary:string){
-        return `Date: ${date}
-        Subject: ${subject}
-        Body: ${bodySummary}`
-    }
-    async classifyEmail(userPrompt:string):Promise<EmailClassificationOutput>{
-        const response = await this.client.chat.completions.create({
-            model:"llama-3.3-70b-versatile",
-            messages:[
-                {
-                    role:"system",
-                    content:this.systemPrompt
-                },
-                {
-                    role:"user",
-                    content:userPrompt
-                }
-            ],
-            response_format:{type:"json_object"}
-        });
-        return JSON.parse(response.choices[0].message.content || "{}") as EmailClassificationOutput;
-    }
-}
+Populate action and reason always. Populate only the fields mapped to the chosen action. Leave all other detail fields as empty strings. forward_receiver_email is always an array. Include every key.`;    

@@ -5,3 +5,4 @@ node_modules
 /prisma/src/generated/prisma
 /logs
 generated
+test.ts

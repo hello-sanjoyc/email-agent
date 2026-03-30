@@ -1,12 +1,12 @@
 import { AuthService } from "./auth.service";
-import { AIService } from "./ai.service";
 import { CalendarService } from "./calendar.service";
 import { EmailService } from "./email.service";
 import { EmailProcessingPayload } from "../../jobs/types";
 import { ActionResultBagItem, CreateEventInput , ImapCreateReplyInput, MarkAsReadInput, MsForwardInput, ProcessEmailResponse, Provider, ReadMessageResponse, SmtpForwardInput } from "./types";
 import * as imaps from 'imap-simple';
+import { AIServiceFactory } from "./ai/ai.factory";
 const auth = new AuthService();
-const ai = new AIService();
+const ai = AIServiceFactory.getProvider();
 const calendar = new CalendarService();
 const email = new EmailService();
 const isProvider = (value:string) => {
@@ -280,7 +280,13 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         isCompleted:true
                     };
                     break;
-                                    
+                default:
+                    actionResult = {
+                        action:actionObject.action,
+                        messageID:msg.messageID,
+                        reason:actionObject.reason,
+                        isCompleted:true
+                    }                    
             }
             //mark the message as read if the action that was decided for that message is successfully completed
             if(actionResult.isCompleted === true){
