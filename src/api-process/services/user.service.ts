@@ -1,0 +1,325 @@
+import { PriorityUpdate } from "../controllers/v1/types";
+import db from "../../db"
+import { AIResponseTone, Prisma } from "../../generated/prisma";
+import AppError from "../utils/appError.utils";
+import { LinkAccountResponse } from "./link-account/types";
+import { LinkCalendarAccountResponse } from "./link-calendar-account/types";
+import { EmailAccountData, UserData, UserDataByEmail, UserProfileData } from "./types";
+
+export const getAccounts = async (userId:string)=> {
+    try{
+        const accounts =await db.emailAccount.findMany({
+            where:{userId},
+            select:{
+                id:true,
+                emailAddress:true,
+                isActive:true,
+                provider:true,
+                priorityWeight:true,
+                createdAt:true
+            }
+        });
+        if(accounts.length === 0) throw new AppError('no profiles found',404);
+        const accountData = accounts.map(function(account){
+            return {
+                id:account.id,
+                email:account.emailAddress,
+                isActive:account.isActive,
+                provider:account.provider,
+                priority:account.priorityWeight,
+                createdAt:account.createdAt
+            }
+        });
+        return accountData;
+    }catch(err){
+        throw err;
+    }
+}
+export const createEmailAccount = async (providerResponse:LinkAccountResponse,userId:string):Promise<boolean> => {
+    try{
+        return await db.$transaction(async(tx)=>{
+            const existingEmailAccounts =await tx.emailAccount.findMany();
+            const isAccountWithSameMail = existingEmailAccounts.some((each)=>each.emailAddress === providerResponse.email);
+            if(isAccountWithSameMail) throw new AppError('Email account already exists',409);
+            await tx.emailAccount.create({
+                data:{
+                    emailAddress:providerResponse.email,
+                    accessToken:providerResponse.accessToken,
+                    refreshToken:providerResponse.refreshToken,
+                    appPassword:providerResponse.password,
+                    imapHost:providerResponse.imap_host,
+                    imapPort:providerResponse.imap_port,
+                    smtpHost:providerResponse.smtp_host,
+                    smtpPort:providerResponse.smtp_port,
+                    provider:providerResponse.provider,
+                    userId,
+                    isActive:true,
+                    priorityWeight:existingEmailAccounts.length === 0?100:0
+                }            
+            });
+            return true;
+        });        
+    }catch(err){
+        throw err;
+    }
+}
+//it returns updated account status in boolean
+export const toggleEmailAccountStatus = async (emailAccountId:string):Promise<boolean> => {
+    try{
+        return db.$transaction(async (tx)=>{
+            const existingEmailAccountData = await db.emailAccount.findFirst({
+                where:{id:emailAccountId},
+                select:{
+                    isActive:true
+                }
+            });
+            if(!existingEmailAccountData) throw new AppError('Invalid email account',400);
+            await db.emailAccount.update({
+                data:{
+                    isActive:!existingEmailAccountData.isActive
+                },
+                where:{
+                    id:emailAccountId
+                }
+            });
+            return !existingEmailAccountData.isActive;    
+        });
+    }catch(err){
+        throw err;
+    }
+}
+export const getUserProfile = async (userId:string):Promise<UserProfileData>=>{
+    try{
+        const profile = await db.user.findUnique({
+            where:{id:userId},
+            select:{
+                id:true,
+                name:true,
+                email:true,
+                phone:true,
+                isActive:true,
+                isAutomationActive:true,
+                aiResponseTone:true,
+                lastAutomationRanAt:true,
+                createdAt:true
+            }
+        });
+        if(!profile) throw new AppError('no profile found',404);
+        return profile;
+    }catch(err){
+        throw err;
+    }
+}
+export const createCalendarAccount = async (providerResponse:LinkCalendarAccountResponse,userId:string):Promise<boolean> => {
+    try{
+        return db.$transaction(async (tx) => {
+            const existingCalendarAccount = await tx.calendarAccount.findFirst(
+                {where:{
+                    emailAddress:providerResponse.email
+                }}
+            );
+            if(existingCalendarAccount) throw new AppError('calendar account already exists',409);
+            await tx.calendarAccount.create({
+                data:{
+                    userId,
+                    emailAddress:providerResponse.email,
+                    accessToken:providerResponse.accessToken,
+                    refreshToken:providerResponse.refreshToken,
+                    provider: providerResponse.provider,
+                    isActive:true                   
+                }
+            });
+            return true;
+        });
+    }catch(err){
+        throw err;
+    }
+}
+export const getCalendarAccounts = async (userId:string)=> {
+    try{
+        const accounts =await db.calendarAccount.findMany({
+            where:{userId},
+            select:{
+                id:true,
+                emailAddress:true,
+                isActive:true,
+                provider:true,
+                createdAt:true
+            }
+        });
+        if(accounts.length === 0) throw new AppError('No calendar accounts found',404);
+        const accountData = accounts.map(function(account){
+            return {
+                id:account.id,
+                email:account.emailAddress,
+                isActive:account.isActive,
+                provider:account.provider,
+                createdAt:account.createdAt
+            }
+        });
+        return accountData;
+    }catch(err){
+        throw err;
+    }
+}
+//it returns updated account status in boolean
+export const toggleCalendarAccountState = async (calendarAccountId:string):Promise<boolean> => {
+    try{
+        return db.$transaction(async (tx)=>{
+            const existingCalendarAccountData = await db.calendarAccount.findFirst({
+                where:{id:calendarAccountId},
+                select:{
+                    isActive:true
+                }
+            });
+            if(!existingCalendarAccountData) throw new AppError('Invalid calendar account',400);
+            await db.calendarAccount.update({
+                data:{
+                    isActive:!existingCalendarAccountData.isActive
+                },
+                where:{
+                    id:calendarAccountId
+                }
+            });
+            return !existingCalendarAccountData.isActive;    
+        });
+    }catch(err){
+        throw err;
+    }
+}
+export const fetchEmailAccount = async (accountId:string):Promise<EmailAccountData> => {
+    try{
+        const emailAccountData = await db.emailAccount.findFirst({where:{id:accountId}});
+        if(!emailAccountData) throw new AppError('No existing email account found',404);
+        return emailAccountData;
+    }catch(err){
+        throw err;
+    }
+}
+export const createCalendarAccFormEmailAcc = async (emailAccountData:EmailAccountData):Promise<boolean> => {
+    try{
+       await db.calendarAccount.create(
+        {
+            data:{
+                userId:emailAccountData.userId,
+                emailAddress:emailAccountData.emailAddress,
+                accessToken:emailAccountData.accessToken,
+                refreshToken:emailAccountData.refreshToken,
+                provider:emailAccountData.provider,
+                isActive:true
+            }
+        }
+       ); 
+       return true;
+    }catch(err){
+        throw err;
+    }
+}
+//to fetch a user's data using its id
+export const fetchUserData = async (userId:string):Promise<UserData> => {
+    try{
+        const userData = await db.user.findUnique({
+            where:{
+                id:userId
+            },
+            select:{
+                id:true,
+                name:true,
+                email:true,
+                phone:true
+            }
+        });
+        if(!userData) throw new AppError('no user found',404);
+        return userData;
+    }catch(err){
+        throw err;
+    }
+}
+//update user with name, email and phone
+export const updateUser = async (id:string,name:string, email:string,phone:string|undefined):Promise<boolean> => {
+    try{
+        await db.user.update({
+            where:{id},
+            data:{name,email,phone}
+        });
+        return true;    
+    }catch(err){
+        throw err;
+    }
+}
+//change the ai response tone for a certain profile
+export const changeProfileAIResponseTone = async (id:string,tone:AIResponseTone):Promise<boolean> => {
+    try{
+        await db.user.update({
+            where:{
+                id
+            },
+            data:{
+                aiResponseTone:tone
+            }
+        });
+        return true;
+    }catch(err){
+        throw err;
+    }
+}
+export const updateProfileAutomationStatus = async (id:string):Promise<boolean> => {
+    try{
+        return await db.$transaction(async(tx)=>{
+            const existingUser =await tx.user.findFirst({
+                where:{id}
+            });
+            if(!existingUser) throw new AppError('User not found',404);
+            await tx.user.update({
+                where:{id},
+                data:{isAutomationActive:!existingUser.isAutomationActive}
+            });
+            return !existingUser.isAutomationActive;
+        });
+    }catch(err){
+        throw err;
+    }
+}
+//get user by email
+export const fetchUserByEmail = async (email:string):Promise<UserDataByEmail>=> {
+    try{
+        const userData = await db.user.findFirst({
+            where:{email},
+            select:{
+                id:true,
+                name:true,
+                email:true
+            }
+        });
+        if(!userData) throw new AppError('User not found',404);
+        return userData;
+    }catch(err){
+        throw err;
+    }
+}
+
+//update email accounts priority
+export const updateEmailAccountPriorityWeight = async (idWithPriority:PriorityUpdate[],userId:string) => {
+    try{
+        // add this log
+        console.log('idWithPriority:', JSON.stringify(idWithPriority));
+        console.log('priority types:', idWithPriority.map(e => ({ val: e.priority, type: typeof e.priority })));
+        const caseFragments = idWithPriority.map((each)=>{
+            return Prisma.sql`WHEN id=${each.id} THEN ${Number(each.priority)}::int`
+        });
+        const ids = idWithPriority.map((each)=>{
+            return each.id;
+        });
+        await db.$executeRaw`
+        UPDATE email_accounts
+        SET priority_weight = CASE
+        ${Prisma.join(caseFragments,'\n')}
+        END
+        WHERE id IN (${Prisma.join(ids)})
+        AND user_id = ${userId}
+        `;
+        return true;
+    }catch(err){
+        throw err;
+    }
+}

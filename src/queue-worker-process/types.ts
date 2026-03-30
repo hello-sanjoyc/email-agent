@@ -1,0 +1,85 @@
+
+export interface EmailProcessingPayload {
+  n8n_payload:N8NPayload;
+  general_data:GeneralData
+  
+}
+export interface GeneralData {
+  user_id:string;
+  plan_id:string;
+  subscription_id:string;
+  email_account_id:string;
+  calendar_account_id:string;
+}
+export interface N8NPayload {
+  process_quantity:number;
+  calendar_mail:string;
+  calendar_refresh_token:string;
+  calendar_provider:string; 
+  subscription_date:Date;
+  google_project_client_id:string;
+  google_project_client_secret:string;
+  microsoft_project_client_id:string;
+  microsoft_project_client_secret:string;
+  microsoft_project_object_id:string;
+  subject_email:string;
+  subject_provider:string;
+  subject_password:string;
+  subject_refresh_token:string;
+  subject_imap_url:string;
+  subject_imap_port:number;
+  subject_smtp_url:string;
+  subject_smtp_port:number;
+}
+
+export interface EmailSendQueuePayload {
+  subject:string;
+  to:string;
+  content:string;
+}
+
+export interface N8NResponseFormat {
+  messageID:string;
+  action:string;
+  reason:string;
+}
+export interface EmailActivityCreationDataset{
+  userId:string;
+  emailAccountId:string;
+  calendarAccountId:string;
+  planId:string;
+  subscriptionId:string;
+  messageId:string;
+  action:string;
+  reason:string | null;
+  isCompleted:boolean;
+  processedAt:Date;
+}
+export enum RazorpayWebhookEvent {
+    SUBSCRIPTION_CHARGED = "subscription.charged",
+    SUBSCRIPTION_ACTIVATED = "subscription.activated",
+    SUBSCRIPTION_HALTED = "subscription.halted",
+    SUBSCRIPTION_CANCELLED = "subscription.cancelled"
+}
+export interface RazorpayJobPayload {
+    event: RazorpayWebhookEvent;
+    payload: {
+        subscription: {
+            entity: {
+                id: string; //gateway subscription id of subscription
+                status: string;
+                current_start?: number;
+                current_end?: number;
+            }
+        };
+        payment?: {
+            entity: {
+                id: string; //payment id
+                amount: number; //amount will be in paise
+                currency: string;
+                order_id: string;
+                status: string;
+            }
+        };
+    };
+}
