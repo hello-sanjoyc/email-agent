@@ -1,0 +1,29 @@
+module.exports={
+apps:[
+  {
+    name:"api-process",
+    script:"./dist/entry.js",
+    env:{
+      NODE_ENV:"production",
+      PROCESS_TYPE:"API"
+    }
+  },
+  {
+    name:"queue-worker-process",
+    script:"./dist/entry.js",
+    env:{
+      NODE_ENV:"production",
+      PROCESS_TYPE:"WORKER"
+    }
+  },
+  {
+    name:"scheduler-process",
+    script:"./dist/entry.js",
+    env:{
+      NODE_ENV:"production",
+      PROCESS_TYPE:"SCHEDULER"
+    }
+  }
+]
+
+}
