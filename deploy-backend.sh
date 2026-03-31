@@ -15,8 +15,9 @@ echo ""
 echo "Installing npm dependencies"
 npm install
 echo ""
-echo "Running Prisma migrations"
+echo "Running Prisma migrations and creating prisma client"
 npx prisma migrate deploy
+npx prisma generate
 echo ""
 echo "Building from ts to js and placing prisma client"
 npm run build
