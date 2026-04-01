@@ -14,7 +14,8 @@ export const fetchAllSubscriptionPlans = async ():Promise<SubscriptionPlanData[]
                 gatewayPlanId:true,
                 billingInterval:true,
                 gatewayCustomerNotify:true,
-                gatewayTotalCount:true
+                gatewayTotalCount:true,
+                maxEmailsPerRun:true
             }
         });
         return plans;
