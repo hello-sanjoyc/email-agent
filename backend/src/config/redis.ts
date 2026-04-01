@@ -24,7 +24,9 @@ export const checkRedisConnectivity = async () => {
     const tempRedisClient = new Redis({
         host:env.REDIS_HOST,
         port:Number(env.REDIS_PORT),
-        maxRetriesPerRequest:0
+        maxRetriesPerRequest:0,
+        username:env.REDIS_USERNAME,
+        password:env.REDIS_PASSWORD
     });
     tempRedisClient.on('error',()=>{});
     try{       
