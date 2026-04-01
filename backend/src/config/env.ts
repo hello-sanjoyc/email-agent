@@ -36,7 +36,9 @@ const envSchema = z.object({
     GROQ_MODEL:z.string().default(""),
     GEMINI_API_KEY:z.string().default(""),
     GEMINI_MODEL:z.string().default(""),
-    ACTIVE_AI_PROVIDER:z.string().default("")
+    ACTIVE_AI_PROVIDER:z.string().default(""),
+    REDIS_USERNAME:z.string().default(""),
+    REDIS_PASSWORD:z.string().default("")
 });
 
 const env = envSchema.parse(process.env);

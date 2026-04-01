@@ -9,7 +9,9 @@ export const initRedisConnection = () => {
         host:env.REDIS_HOST,
         port:Number(env.REDIS_PORT),
         maxRetriesPerRequest:null,
-        enableReadyCheck:false
+        enableReadyCheck:false,
+        username:env.REDIS_USERNAME,
+        password:env.REDIS_PASSWORD
     });
     redisConnection.on('connect',()=>{
         logger.info("[REDIS CONNECTION] connected");
