@@ -1,7 +1,7 @@
 module.exports={
 apps:[
   {
-    name:"api-process",
+    name:"EmailAgent-API",
     script:"./dist/entry.js",
     env:{
       NODE_ENV:"production",
@@ -9,7 +9,7 @@ apps:[
     }
   },
   {
-    name:"queue-worker-process",
+    name:"EmailAgent-Queue",
     script:"./dist/entry.js",
     env:{
       NODE_ENV:"production",
@@ -17,7 +17,7 @@ apps:[
     }
   },
   {
-    name:"scheduler-process",
+    name:"EmailAgent-Scheduler",
     script:"./dist/entry.js",
     env:{
       NODE_ENV:"production",
