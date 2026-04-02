@@ -15,7 +15,7 @@ import userRouter from './routes/v1/user.route.js'
 import financeRouter from './routes/v1/finance.route.js'
 export const app = express();
 app.use(cors({
-    origin: 'http://localhost:5173', // For demo purposes, this allows any origin
+    origin: 'https://ema.aranax.tech', // For demo purposes, this allows any origin
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
 }));
