@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { authenticate } from '../../middlewares/authentication.js';
-import { getSubscriptionPlans , getCurrentSubscriptionPlan, createSubscription,verifySubscription } from '../../controllers/v1/finance.controller.js';
+import { getSubscriptionPlans , getCurrentSubscriptionPlan, createSubscription,verifySubscription, respondToWebhook } from '../../controllers/v1/finance.controller.js';
 import { createSubscriptionValidationRules, verifySubscriptionValidationRules } from '../../validators/finance.validator.js';
 import { checkRouteValidity } from '../../middlewares/validationMiddleware.js';
 
@@ -18,3 +18,6 @@ financeRouter.post('/create-subscription',authenticate,createSubscriptionValidat
 //verify a subscription payment
 financeRouter.post('/verify-subscription',authenticate,verifySubscriptionValidationRules,checkRouteValidity,verifySubscription);
 export default financeRouter;
+
+//respond to razorpay webhook
+financeRouter.post('/razorpay/respond-to-webhook',respondToWebhook);
