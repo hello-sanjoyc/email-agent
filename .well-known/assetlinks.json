@@ -1,0 +1,15 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.aranax.stitch",
+            "sha256_cert_fingerprints": [
+                "10:1A:38:91:18:7B:8F:92:F2:12:75:62:8D:5E:9C:31:0E:A4:3B:61:63:0E:A5:4E:3A:CC:2A:46:60:E8:B0:FD",
+                "31:34:E4:7F:76:B7:2A:C7:E0:06:07:5A:E0:7D:52:8F:2B:50:0B:8F:CA:38:DA:B4:A3:66:7D:2D:C0:3B:25:8F"
+            ]
+        }
+    }
+]
