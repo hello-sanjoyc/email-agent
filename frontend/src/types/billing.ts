@@ -1,11 +1,11 @@
 export interface SubscriptionPlanData {
-    id:string;
-    name:string;
-    quota:number;
-    price:string;
-    billingInterval: 'MONTH' | 'YEAR' | 'TRIAL'; // Crucial for UI
-    gatewayTotalCount:number;
-    maxEmailsPerRun:number;
+    id: string;
+    name: string;
+    quota: number;
+    price: string;
+    billingInterval: "MONTH" | "YEAR" | "TRIAL"; // Crucial for UI
+    gatewayTotalCount: number;
+    maxEmailsPerRun: number;
 }
 export interface UserData {
     id: string;
@@ -30,14 +30,15 @@ export interface ActiveSubscriptionPlanData {
 }
 export const AIResponseTone = {
     CASUAL: "CASUAL",
-    PROFESSIONAL: "PROFESSIONAL"
+    PROFESSIONAL: "PROFESSIONAL",
 } as const;
-export type AIResponseTone = typeof AIResponseTone[keyof typeof AIResponseTone]
+export type AIResponseTone =
+    (typeof AIResponseTone)[keyof typeof AIResponseTone];
 
-export interface ApiResponse<T>{
-    error:boolean;
-    message:string;
-    data:T;
+export interface ApiResponse<T> {
+    error: boolean;
+    message: string;
+    data: T;
 }
 // Update the create response structure
 export interface CreateSubscriptionResponse {
@@ -45,43 +46,43 @@ export interface CreateSubscriptionResponse {
     internalSubscriptionId: string;
 }
 export interface RazorpayResponse {
-    razorpay_payment_id:string;
-    razorpay_subscription_id:string;
-    razorpay_signature:string;
+    razorpay_payment_id: string;
+    razorpay_subscription_id: string;
+    razorpay_signature: string;
 }
 export interface RazorpayModalOptions {
-    key:string;
-    subscription_id:string;
-    name:string;
-    description:string;
-    prefill:{
-        name?:string;
-        email?:string;
-        contact?:string;
+    key: string;
+    subscription_id: string;
+    name: string;
+    description: string;
+    prefill: {
+        name?: string;
+        email?: string;
+        contact?: string;
     };
-    theme:{
-        color:string;
+    theme: {
+        color: string;
     };
-    modal?:{
-        onDismiss?:()=>void
-    }
-    handler:(razorPayResponse:RazorpayResponse) => Promise<void> | void;
+    modal?: {
+        onDismiss?: () => void;
+    };
+    handler: (razorPayResponse: RazorpayResponse) => Promise<void> | void;
 }
 declare global {
-  interface Window {
-    Razorpay: new (options: RazorpayModalOptions) => {
-      open: () => void;
-    };
-  }
+    interface Window {
+        Razorpay: new (options: RazorpayModalOptions) => {
+            open: () => void;
+        };
+    }
 }
-export interface UserProfileData {    
+export interface UserProfileData {
     id: string;
     email: string;
     name: string;
     phone: string | null;
     isActive: boolean;
-    isAutomationActive:boolean;
-    aiResponseTone:AIResponseTone;
-    lastAutomationRanAt:string | null;
-    createdAt: string;   
+    isAutomationActive: boolean;
+    aiResponseTone: AIResponseTone;
+    lastAutomationRanAt: string | null;
+    createdAt: string;
 }

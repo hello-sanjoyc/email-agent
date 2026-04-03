@@ -26,15 +26,15 @@ export const PlanCard = ({ plan, isCurrent, onSelect }: Props) => {
   return (
     <div className={`relative flex flex-col gap-5 rounded-2xl p-7 transition-all
       ${featured
-        ? "bg-[#0d7ff2] border-2 border-[#0d7ff2] shadow-2xl shadow-blue-500/25"
+        ? "bg-gradient-to-br from-[#644ae9] to-[#7556ff] border-2 border-[#644ae9] shadow-2xl shadow-purple-500/25"
         : isCurrent
-        ? "bg-white border-2 border-[#0d7ff2]"
-        : "bg-white border border-slate-200 shadow-sm"
+        ? "bg-white border-2 border-[#644ae9] shadow-md shadow-purple-100/70"
+        : "bg-white border border-purple-100 shadow-sm hover:shadow-md hover:-translate-y-0.5"
       }`}
     >
       {/* Badge */}
       {(featured || isCurrent) && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0d7ff2] text-white text-xs font-bold tracking-wider px-4 py-1 rounded-full whitespace-nowrap shadow-lg shadow-blue-500/30">
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#644ae9] text-white text-xs font-bold tracking-wider px-4 py-1 rounded-full whitespace-nowrap shadow-lg shadow-purple-500/30">
           {isCurrent ? "Current plan" : "Most popular"}
         </div>
       )}
@@ -42,7 +42,7 @@ export const PlanCard = ({ plan, isCurrent, onSelect }: Props) => {
       {/* Plan label + name + price */}
       <div>
         <p className={`text-xs font-mono tracking-widest uppercase mb-3
-          ${featured ? "text-blue-100" : "text-slate-400"}`}>
+          ${featured ? "text-purple-100" : "text-slate-500"}`}>
           {intervalLabel}
         </p>
 
@@ -62,7 +62,7 @@ export const PlanCard = ({ plan, isCurrent, onSelect }: Props) => {
             {isFree ? "Free" : `₹${Number(plan.price).toLocaleString("en-IN")}`}
           </span>
           {!isFree && (
-            <span className={`text-sm ${featured ? "text-blue-200" : "text-slate-400"}`}>
+            <span className={`text-sm ${featured ? "text-purple-200" : "text-slate-500"}`}>
               /{plan.billingInterval === "YEAR" ? "yr" : "mo"}
             </span>
           )}
@@ -70,7 +70,7 @@ export const PlanCard = ({ plan, isCurrent, onSelect }: Props) => {
       </div>
 
       {/* Divider */}
-      <div className={`h-px ${featured ? "bg-blue-400/40" : "bg-slate-100"}`} />
+      <div className={`h-px ${featured ? "bg-purple-300/40" : "bg-purple-100/80"}`} />
 
       {/* Features */}
       <div className="flex flex-col gap-3 flex-1">
@@ -89,11 +89,11 @@ export const PlanCard = ({ plan, isCurrent, onSelect }: Props) => {
         className={`w-full py-3 rounded-xl text-sm font-bold transition-all
           ${isCurrent
             ? featured
-              ? "bg-blue-400/30 text-blue-200 cursor-not-allowed"
+              ? "bg-purple-400/30 text-purple-200 cursor-not-allowed"
               : "bg-slate-100 text-slate-300 cursor-not-allowed"
             : featured
-            ? "bg-white text-[#0d7ff2] hover:bg-blue-50 shadow-lg"
-            : "bg-[#0d7ff2] text-white hover:brightness-110 shadow-lg shadow-blue-500/20"
+            ? "bg-white text-[#644ae9] hover:bg-purple-50 shadow-lg"
+            : "bg-[#644ae9] text-white hover:brightness-110 shadow-lg shadow-purple-500/20"
           }`}
       >
         {ctaLabel}
@@ -110,7 +110,7 @@ interface FeatureRowProps {
 
 const FeatureRow = ({ label, value, featured }: FeatureRowProps) => (
   <div className="flex justify-between items-center">
-    <span className={`text-sm ${featured ? "text-blue-200" : "text-slate-400"}`}>{label}</span>
+    <span className={`text-sm ${featured ? "text-purple-200" : "text-slate-500"}`}>{label}</span>
     <span className={`text-sm font-semibold ${featured ? "text-white" : "text-slate-700"}`}>{value}</span>
   </div>
 );

@@ -3,13 +3,13 @@ import api from "../api/axios";
 import MainLayout from "../layouts/MainLayout";
 import { PlanCard } from "../components/plans/PlanCard";
 import type {
-  ApiResponse,
-  SubscriptionPlanData,
-  ActiveSubscriptionPlanData,
-  CreateSubscriptionResponse,
-  RazorpayModalOptions,
-  RazorpayResponse,
-  UserProfileData,
+    ApiResponse,
+    SubscriptionPlanData,
+    ActiveSubscriptionPlanData,
+    CreateSubscriptionResponse,
+    RazorpayModalOptions,
+    RazorpayResponse,
+    UserProfileData,
 } from "../types/billing";
 import loadRazorpayScript from "../utilities/loadRazorpay";
 import toast from "react-hot-toast";
@@ -17,189 +17,215 @@ import toast from "react-hot-toast";
 type BillingTab = "MONTH" | "YEAR";
 
 export default function SubscriptionPage() {
-  const [user, setUser] = useState<UserProfileData | null>(null);
-  const [plans, setPlans] = useState<SubscriptionPlanData[]>([]);
-  const [activeSub, setActiveSub] = useState<ActiveSubscriptionPlanData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [billingTab, setBillingTab] = useState<BillingTab>("MONTH");
+    const [user, setUser] = useState<UserProfileData | null>(null);
+    const [plans, setPlans] = useState<SubscriptionPlanData[]>([]);
+    const [activeSub, setActiveSub] =
+        useState<ActiveSubscriptionPlanData | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [billingTab, setBillingTab] = useState<BillingTab>("MONTH");
 
-  useEffect(() => {
-    const fetchBillingData = async () => {
-      try {
-        const [plansRes, subRes, userRes] = await Promise.all([
-          api.get<ApiResponse<SubscriptionPlanData[]>>("/api/v1/finance/subscription-plans"),
-          api.get<ApiResponse<ActiveSubscriptionPlanData>>("/api/v1/finance/active-subscription-plan"),
-          api.get<ApiResponse<UserProfileData>>("/api/v1/user/profile"),
-        ]);
-        setPlans(plansRes.data.data);
-        setActiveSub(subRes.data.data);
-        setUser(userRes.data.data);
-      } catch (err) {
-        console.error(err);
-        toast.error("Error loading billing data");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchBillingData();
-  }, []);
+    useEffect(() => {
+        const fetchBillingData = async () => {
+            try {
+                const [plansRes, subRes, userRes] = await Promise.all([
+                    api.get<ApiResponse<SubscriptionPlanData[]>>(
+                        "/api/v1/finance/subscription-plans",
+                    ),
+                    api.get<ApiResponse<ActiveSubscriptionPlanData>>(
+                        "/api/v1/finance/active-subscription-plan",
+                    ),
+                    api.get<ApiResponse<UserProfileData>>(
+                        "/api/v1/user/profile",
+                    ),
+                ]);
+                setPlans(plansRes.data.data);
+                setActiveSub(subRes.data.data);
+                setUser(userRes.data.data);
+            } catch (err) {
+                console.error(err);
+                toast.error("Error loading billing data");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchBillingData();
+    }, []);
 
-  const handlePlanSelect = async (planId: string) => {
-    try {
-      setLoading(true);
-      const response = await api.post<ApiResponse<CreateSubscriptionResponse>>(
-        "/api/v1/finance/create-subscription",
-        { planId }
-      );
-      const { gatewaySubscriptionId, internalSubscriptionId } = response.data.data;
+    const handlePlanSelect = async (planId: string) => {
+        try {
+            setLoading(true);
+            const response = await api.post<
+                ApiResponse<CreateSubscriptionResponse>
+            >("/api/v1/finance/create-subscription", { planId });
+            const { gatewaySubscriptionId, internalSubscriptionId } =
+                response.data.data;
 
-      const isLoaded = await loadRazorpayScript();
-      if (!isLoaded) {
-        toast.error("Some error has occurred");
-        return;
-      }
+            const isLoaded = await loadRazorpayScript();
+            if (!isLoaded) {
+                toast.error("Some error has occurred");
+                return;
+            }
 
-      const options: RazorpayModalOptions = {
-        key: import.meta.env.RAZORPAY_KEY_ID,
-        subscription_id: gatewaySubscriptionId,
-        name: import.meta.env.APP_NAME,
-        description: "Subscription Payment",
-        prefill: {
-          name: user?.name,
-          email: user?.email,
-          contact: user?.phone ?? "",
-        },
-        handler: async (razorpayResponse: RazorpayResponse) => {
-          try {
-            await api.post<ApiResponse<boolean>>("/api/v1/finance/verify-subscription", {
-              razorpay_payment_id: razorpayResponse.razorpay_payment_id,
-              razorpay_subscription_id: razorpayResponse.razorpay_subscription_id,
-              razorpay_signature: razorpayResponse.razorpay_signature,
-              internal_subscription_id: internalSubscriptionId,
-            });
-            toast.success("Subscription activated! Your quota has been updated");
-            window.location.reload();
-          } catch (err) {
+            const options: RazorpayModalOptions = {
+                key: import.meta.env.RAZORPAY_KEY_ID,
+                subscription_id: gatewaySubscriptionId,
+                name: import.meta.env.APP_NAME,
+                description: "Subscription Payment",
+                prefill: {
+                    name: user?.name,
+                    email: user?.email,
+                    contact: user?.phone ?? "",
+                },
+                handler: async (razorpayResponse: RazorpayResponse) => {
+                    try {
+                        await api.post<ApiResponse<boolean>>(
+                            "/api/v1/finance/verify-subscription",
+                            {
+                                razorpay_payment_id:
+                                    razorpayResponse.razorpay_payment_id,
+                                razorpay_subscription_id:
+                                    razorpayResponse.razorpay_subscription_id,
+                                razorpay_signature:
+                                    razorpayResponse.razorpay_signature,
+                                internal_subscription_id:
+                                    internalSubscriptionId,
+                            },
+                        );
+                        toast.success(
+                            "Subscription activated! Your quota has been updated",
+                        );
+                        window.location.reload();
+                    } catch (err) {
+                        console.error(err);
+                        toast.error("Error during payment verification");
+                    }
+                },
+                theme: { color: "#644ae9" },
+                modal: {
+                    onDismiss: () => setLoading(false),
+                },
+            };
+
+            const rzp = new window.Razorpay(options);
+            rzp.open();
+        } catch (err) {
             console.error(err);
-            toast.error("Error during payment verification");
-          }
-        },
-        theme: { color: "#0d7ff2" },
-        modal: {
-          onDismiss: () => setLoading(false),
-        },
-      };
+            toast.error("Unexpected error has occurred");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-    } catch (err) {
-      console.error(err);
-      toast.error("Unexpected error has occurred");
-    } finally {
-      setLoading(false);
+    const visiblePlans = plans.filter((p) => p.billingInterval === billingTab);
+
+    if (loading) {
+        return (
+            <MainLayout>
+                <div className="min-h-[80vh] w-full flex flex-col items-center justify-center gap-4">
+                    <div className="w-9 h-9 rounded-full border-2 border-purple-100 border-t-[#644ae9] animate-spin" />
+                    <p className="text-slate-400 text-xs tracking-widest font-mono uppercase">
+                        Loading plans
+                    </p>
+                </div>
+            </MainLayout>
+        );
     }
-  };
 
-  const visiblePlans = plans.filter((p) => p.billingInterval === billingTab);
-
-  if (loading) {
     return (
-      <MainLayout>
-        <div className="min-h-[80vh] w-full flex flex-col items-center justify-center gap-4">
-          <div className="w-9 h-9 rounded-full border-2 border-slate-200 border-t-[#0d7ff2] animate-spin" />
-          <p className="text-slate-400 text-xs tracking-widest font-mono uppercase">Loading plans</p>
-        </div>
-      </MainLayout>
+        <MainLayout>
+            <div className="relative w-full pb-20 overflow-hidden">
+                <div className="absolute top-8 left-1/2 -translate-x-1/2 w-[70rem] h-[36rem] bg-gradient-to-b from-purple-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -top-28 right-0 w-72 h-72 bg-[#644ae9]/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="max-w-6xl mx-auto px-6 relative z-10">
+                    {/* Header */}
+                    <div className="text-center pt-12 pb-14">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-[#644ae9] text-xs font-bold uppercase tracking-wider mb-6">
+                            <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#644ae9] opacity-75" />
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#644ae9]" />
+                            </span>
+                            Choose your plan
+                        </div>
+
+                        <h1 className="text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
+                            Email Agent <br />
+                            <span className="text-[#644ae9]">Premium</span>
+                        </h1>
+
+                        <p className="text-base text-slate-500 max-w-sm mx-auto leading-relaxed">
+                            Scale your AI email automation. No contracts, cancel
+                            anytime.
+                        </p>
+
+                        {activeSub && (
+                            <div className="inline-flex items-center gap-2 mt-6 bg-purple-50 border border-purple-200 rounded-xl px-4 py-2">
+                                <div className="w-2 h-2 rounded-full bg-[#644ae9]" />
+                                <span className="text-sm text-purple-700 font-mono">
+                                    Active plan
+                                </span>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Toggle + Cards */}
+                    <div className="rounded-4xl border border-purple-100 bg-white/90 backdrop-blur-sm shadow-sm p-5 md:p-8">
+                        {/* Billing interval toggle */}
+                        <div className="flex justify-end mb-5">
+                            <div className="inline-flex items-center bg-purple-50/80 border border-purple-100 rounded-xl p-1 gap-1 shadow-sm">
+                                <button
+                                    onClick={() => setBillingTab("MONTH")}
+                                    className={`px-5 py-2 rounded-lg text-sm font-medium transition-all
+                    ${
+                        billingTab === "MONTH"
+                            ? "bg-[#644ae9] text-white shadow-md shadow-purple-500/20"
+                            : "text-slate-500 hover:text-slate-700"
+                    }`}
+                                >
+                                    Monthly
+                                </button>
+                                <button
+                                    onClick={() => setBillingTab("YEAR")}
+                                    className={`px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2
+                    ${
+                        billingTab === "YEAR"
+                            ? "bg-[#644ae9] text-white shadow-md shadow-purple-500/20"
+                            : "text-slate-500 hover:text-slate-700"
+                    }`}
+                                >
+                                    Yearly
+                                    <span
+                                        className={`text-xs font-semibold px-2 py-0.5 rounded-full transition-all
+                    ${
+                        billingTab === "YEAR"
+                            ? "bg-white/20 text-white"
+                            : "bg-purple-100 text-[#644ae9]"
+                    }`}
+                                    >
+                                        Save 20%
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Plans grid */}
+                        <div className="grid md:grid-cols-2 gap-6 items-start">
+                            {visiblePlans.map((plan) => (
+                                <PlanCard
+                                    key={plan.id}
+                                    plan={plan}
+                                    isCurrent={activeSub?.planId === plan.id}
+                                    onSelect={handlePlanSelect}
+                                />
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Footer note */}
+                    <p className="text-center mt-12 text-xs text-slate-400 font-mono tracking-wide">
+                        Secured by Razorpay · Cancel anytime
+                    </p>
+                </div>
+            </div>
+        </MainLayout>
     );
-  }
-
-  return (
-    <MainLayout>
-      <div className="w-full pb-20">
-        <div className="max-w-5xl mx-auto px-6">
-
-          {/* Header */}
-          <div className="text-center pt-12 pb-14">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-[#0d7ff2] text-xs font-bold uppercase tracking-wider mb-6">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0d7ff2] opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#0d7ff2]" />
-              </span>
-              Choose your plan
-            </div>
-
-            <h1 className="text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
-              Email Agent <br />
-              <span className="text-[#0d7ff2]">Premium</span>
-            </h1>
-
-            <p className="text-base text-slate-500 max-w-sm mx-auto leading-relaxed">
-              Scale your AI email automation. No contracts, cancel anytime.
-            </p>
-
-            {activeSub && (
-              <div className="inline-flex items-center gap-2 mt-6 bg-green-50 border border-green-200 rounded-xl px-4 py-2">
-                <div className="w-2 h-2 rounded-full bg-green-500" />
-                <span className="text-sm text-green-700 font-mono">Active plan</span>
-              </div>
-            )}
-          </div>
-
-          {/* Toggle + Cards */}
-          <div>
-
-            {/* Billing interval toggle */}
-            <div className="flex justify-end mb-5">
-              <div className="inline-flex items-center bg-white border border-slate-200 rounded-xl p-1 gap-1 shadow-sm">
-                <button
-                  onClick={() => setBillingTab("MONTH")}
-                  className={`px-5 py-2 rounded-lg text-sm font-medium transition-all
-                    ${billingTab === "MONTH"
-                      ? "bg-[#0d7ff2] text-white shadow-md shadow-blue-500/20"
-                      : "text-slate-400 hover:text-slate-600"
-                    }`}
-                >
-                  Monthly
-                </button>
-                <button
-                  onClick={() => setBillingTab("YEAR")}
-                  className={`px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2
-                    ${billingTab === "YEAR"
-                      ? "bg-[#0d7ff2] text-white shadow-md shadow-blue-500/20"
-                      : "text-slate-400 hover:text-slate-600"
-                    }`}
-                >
-                  Yearly
-                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-full transition-all
-                    ${billingTab === "YEAR"
-                      ? "bg-white/20 text-white"
-                      : "bg-blue-100 text-[#0d7ff2]"
-                    }`}>
-                    Save 20%
-                  </span>
-                </button>
-              </div>
-            </div>
-
-            {/* Plans grid */}
-            <div className="grid md:grid-cols-2 gap-4 items-start">
-              {visiblePlans.map((plan) => (
-                <PlanCard
-                  key={plan.id}
-                  plan={plan}
-                  isCurrent={activeSub?.planId === plan.id}
-                  onSelect={handlePlanSelect}
-                />
-              ))}
-            </div>
-          </div>
-
-          {/* Footer note */}
-          <p className="text-center mt-12 text-xs text-slate-300 font-mono tracking-wide">
-            Secured by Razorpay · Cancel anytime
-          </p>
-        </div>
-      </div>
-    </MainLayout>
-  );
 }
