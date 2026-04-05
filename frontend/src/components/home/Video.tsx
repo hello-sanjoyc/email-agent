@@ -2,8 +2,7 @@ import { useEffect, useState } from "react";
 
 export default function Video() {
     const [open, setOpen] = useState(false);
-    const videoUrl =
-        "https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1&mute=1";
+    const videoUrl = "https://www.youtube.com/embed/06hNb4SeWYY?autoplay=1";
 
     useEffect(() => {
         // prevent background scroll when modal open
