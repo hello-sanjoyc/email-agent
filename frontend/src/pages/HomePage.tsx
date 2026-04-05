@@ -5,7 +5,7 @@ import "aos/dist/aos.css";
 import MainLayout from "../layouts/MainLayout";
 import Introduction from "../components/home/Introduction";
 import Workflow from "../components/home/Workflow";
-import Video from "../components/home/Video";
+//import Video from "../components/home/Video";
 import Faq from "../components/home/Faq";
 import Enquiry from "../components/home/Enquiry";
 
@@ -65,7 +65,7 @@ export default function HomePage() {
         <MainLayout showFooter>
             <Introduction />
             <Workflow />
-            <Video />
+            {/* <Video /> */}
             <Faq />
             <Enquiry />
         </MainLayout>
