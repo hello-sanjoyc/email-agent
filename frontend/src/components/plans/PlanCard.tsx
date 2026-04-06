@@ -4,12 +4,13 @@ interface Props {
   plan: SubscriptionPlanData;
   isCurrent: boolean;
   onSelect: (id: string) => void;
+  isAuthenticated:boolean;
 }
 
 const isFeatured = (plan: SubscriptionPlanData): boolean =>
   plan.name.toLowerCase().includes("plus");
 
-export const PlanCard = ({ plan, isCurrent, onSelect }: Props) => {
+export const PlanCard = ({ plan, isCurrent, onSelect, isAuthenticated }: Props) => {
   const featured = isFeatured(plan);
   const isFree = Number(plan.price) === 0;
 
@@ -83,21 +84,23 @@ export const PlanCard = ({ plan, isCurrent, onSelect }: Props) => {
       </div>
 
       {/* CTA button */}
-      <button
-        onClick={() => !isCurrent && onSelect(plan.id)}
-        disabled={isCurrent}
-        className={`w-full py-3 rounded-xl text-sm font-bold transition-all
-          ${isCurrent
-            ? featured
-              ? "bg-purple-400/30 text-purple-200 cursor-not-allowed"
-              : "bg-slate-100 text-slate-300 cursor-not-allowed"
-            : featured
-            ? "bg-white text-[#644ae9] hover:bg-purple-50 shadow-lg"
-            : "bg-[#644ae9] text-white hover:brightness-110 shadow-lg shadow-purple-500/20"
-          }`}
-      >
-        {ctaLabel}
-      </button>
+      {isAuthenticated && (
+        <button
+          onClick={() => !isCurrent && onSelect(plan.id)}
+          disabled={isCurrent}
+          className={`w-full py-3 rounded-xl text-sm font-bold transition-all
+            ${isCurrent
+              ? featured
+                ? "bg-purple-400/30 text-purple-200 cursor-not-allowed"
+                : "bg-slate-100 text-slate-300 cursor-not-allowed"
+              : featured
+              ? "bg-white text-[#644ae9] hover:bg-purple-50 shadow-lg"
+              : "bg-[#644ae9] text-white hover:brightness-110 shadow-lg shadow-purple-500/20"
+            }`}
+        >
+          {ctaLabel}
+        </button>
+      )}      
     </div>
   );
 };

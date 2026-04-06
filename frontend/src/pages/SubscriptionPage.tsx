@@ -13,6 +13,7 @@ import type {
 } from "../types/billing";
 import loadRazorpayScript from "../utilities/loadRazorpay";
 import toast from "react-hot-toast";
+import { isAuthenticated } from "../hooks/useAuth";
 
 type BillingTab = "MONTH" | "YEAR";
 
@@ -23,24 +24,26 @@ export default function SubscriptionPage() {
         useState<ActiveSubscriptionPlanData | null>(null);
     const [loading, setLoading] = useState(true);
     const [billingTab, setBillingTab] = useState<BillingTab>("MONTH");
-
+    const isAuthenticatedUser = isAuthenticated();
     useEffect(() => {
         const fetchBillingData = async () => {
             try {
-                const [plansRes, subRes, userRes] = await Promise.all([
-                    api.get<ApiResponse<SubscriptionPlanData[]>>(
-                        "/api/v1/finance/subscription-plans",
-                    ),
-                    api.get<ApiResponse<ActiveSubscriptionPlanData>>(
-                        "/api/v1/finance/active-subscription-plan",
-                    ),
-                    api.get<ApiResponse<UserProfileData>>(
-                        "/api/v1/user/profile",
-                    ),
-                ]);
+                const plansRes = await api.get<ApiResponse<SubscriptionPlanData[]>>(
+                    "/api/v1/finance/subscription-plans",
+                );
                 setPlans(plansRes.data.data);
-                setActiveSub(subRes.data.data);
-                setUser(userRes.data.data);
+                if(isAuthenticatedUser){
+                    const [subRes, userRes] = await Promise.all([
+                        api.get<ApiResponse<ActiveSubscriptionPlanData>>(
+                            "/api/v1/finance/active-subscription-plan",
+                        ),
+                        api.get<ApiResponse<UserProfileData>>(
+                            "/api/v1/user/profile",
+                        ),
+                    ]);                
+                    setActiveSub(subRes.data.data);
+                    setUser(userRes.data.data);
+                }                
             } catch (err) {
                 console.error(err);
                 toast.error("Error loading billing data");
@@ -49,7 +52,7 @@ export default function SubscriptionPage() {
             }
         };
         fetchBillingData();
-    }, []);
+    }, [isAuthenticatedUser]);
 
     const handlePlanSelect = async (planId: string) => {
         try {
@@ -215,6 +218,7 @@ export default function SubscriptionPage() {
                                     plan={plan}
                                     isCurrent={activeSub?.planId === plan.id}
                                     onSelect={handlePlanSelect}
+                                    isAuthenticated={isAuthenticatedUser}
                                 />
                             ))}
                         </div>

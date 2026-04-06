@@ -7,7 +7,7 @@ import { checkRouteValidity } from '../../middlewares/validationMiddleware.js';
 //TODO:the express validation is left out for now, REMEMBER TO ADD IT!
 const financeRouter = Router();
 //get all subscription plans
-financeRouter.get('/subscription-plans',authenticate,getSubscriptionPlans);
+financeRouter.get('/subscription-plans',getSubscriptionPlans);
 
 //get user's current active plan
 financeRouter.get('/active-subscription-plan',authenticate,getCurrentSubscriptionPlan);
