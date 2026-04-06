@@ -17,7 +17,8 @@ financeRouter.post('/create-subscription',authenticate,createSubscriptionValidat
 
 //verify a subscription payment
 financeRouter.post('/verify-subscription',authenticate,verifySubscriptionValidationRules,checkRouteValidity,verifySubscription);
-export default financeRouter;
 
 //respond to razorpay webhook
 financeRouter.post('/razorpay/respond-to-webhook',respondToWebhook);
+
+export default financeRouter;

@@ -86,3 +86,10 @@ export interface UserProfileData {
     lastAutomationRanAt: string | null;
     createdAt: string;
 }
+export interface SubmitEnquiryInput {
+    full_name:string;
+    email:string;
+    phone:string;
+    company:string;
+    message:string;
+}

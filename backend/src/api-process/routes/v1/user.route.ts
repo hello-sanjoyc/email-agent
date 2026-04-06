@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getProfile, getUserAccounts, linkAccount,getUserCalendarAccounts,linkCalendarAccount, toggleAccountStatus, toggleCalendarAccountStatus,getServiceStats,updateProfile, getAIResponseTones, changeAIResponseTone, toggleAutomationStatus, updateEmailAccountsPriority } from '../../controllers/v1/user.controller.js';
+import { getProfile, getUserAccounts, linkAccount,getUserCalendarAccounts,linkCalendarAccount, toggleAccountStatus, toggleCalendarAccountStatus,getServiceStats,updateProfile, getAIResponseTones, changeAIResponseTone, toggleAutomationStatus, updateEmailAccountsPriority, deleteEmailAccount, deleteCalendarAccount } from '../../controllers/v1/user.controller.js';
 import { authenticate } from '../../middlewares/authentication.js';
 import { updateEmailAccountsPriorityValidationRules } from '../../validators/user.validator.js';
 import { checkRouteValidity } from '../../middlewares/validationMiddleware.js';
@@ -34,4 +34,8 @@ userRouter.put('/ai-response-tone',authenticate,changeAIResponseTone);
 userRouter.put('/toggle-automation',authenticate,toggleAutomationStatus);
 //changing email account priorities
 userRouter.put('/update-email-accounts-priority',authenticate,updateEmailAccountsPriorityValidationRules,checkRouteValidity,updateEmailAccountsPriority);
+//delete email account
+userRouter.delete('/email-account/:id',authenticate,deleteEmailAccount);
+//delete email account
+userRouter.delete('/calendar-account/:id',authenticate,deleteCalendarAccount);
 export default userRouter;

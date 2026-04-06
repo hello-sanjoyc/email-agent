@@ -39,9 +39,9 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
         }  
         //get the calendar access token when provider is microsoft or google
         if(n8n_payload.calendar_provider === "microsoft"){
-            calendarAccountAccessToken = await auth.refreshMicrosoftToken(n8n_payload.subject_refresh_token);
+            calendarAccountAccessToken = await auth.refreshMicrosoftToken(n8n_payload.calendar_refresh_token);
         }else if(payload.n8n_payload.calendar_provider === "google"){
-            calendarAccountAccessToken = await auth.refreshGoogleToken(n8n_payload.subject_refresh_token);           
+            calendarAccountAccessToken = await auth.refreshGoogleToken(n8n_payload.calendar_refresh_token);           
         }else{
             return {
                 error:true,

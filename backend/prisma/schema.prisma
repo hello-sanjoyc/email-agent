@@ -199,3 +199,30 @@ enum BillingInterval {
   YEAR
   TRIAL
 }
+
+model Enquiry {
+  id String @db.Uuid @default(uuid()) @id @map("id")
+  fullName String @db.VarChar(200) @map("full_name")
+  email String @db.VarChar(100) @map("email")
+  phone String @db.VarChar(15) @map("phone")
+  company String @db.VarChar(200) @map("company")  
+  message String @db.Text @map("message")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@map("enquiries")
+}
+
+model AITone {
+  id String @db.Uuid @default(uuid()) @id @map("id")
+  tone AIResponseTone @default(PROFESSIONAL) @map("tone")
+  isActive Boolean @db.Boolean @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@map("ai_tones")
+}
+
+model AIService {
+  id String @db.Uuid() @default(uuid()) @id @map("id")
+  name String @db.VarChar(100) @unique @map("name")
+  isActive Boolean @db.Boolean @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@map("ai_services")
+}

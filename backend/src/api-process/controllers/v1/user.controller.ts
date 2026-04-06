@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../../utils/appError.utils";
-import { changeProfileAIResponseTone, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, fetchEmailAccount, fetchUserData, getAccounts, getCalendarAccounts, getUserProfile, toggleCalendarAccountState, toggleEmailAccountStatus, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
+import { changeProfileAIResponseTone, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, fetchEmailAccount, fetchUserData, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
 import { ChangeAIResponseToneInput, LinkAccountInput,LinkCalendarAccountInput, ToggleAutomationStatus, UpdateEmailAccountsPriorityInput, UpdateProfileInput } from "./types";
 import { LinkAccountFactory } from "../../services/link-account/factory";
 import { LinkCalendarAccountFactory } from "../../services/link-calendar-account/factory";
@@ -257,6 +257,41 @@ export const updateEmailAccountsPriority = async (req:Request,res:Response,next:
         return res.status(200).json({
             error:false,
             message:'Priority updated'
+        });
+    }catch(err){
+        next(err);
+    }
+}
+//delete email account(soft or hard based on usage)
+export const deleteEmailAccount = async (req:Request,res:Response,next:NextFunction) => {
+    try{
+        const emailAccId = req.params.id as string;
+        const userId = req.user?.id;
+        if(!userId) throw new AppError('Invalid user',400);
+        if(!emailAccId) throw new AppError('Invalid email account',400);
+        const deletionResponse = await softOrHardDeleteEmailAccount(userId,emailAccId);
+        if(!deletionResponse) throw new AppError('Error deleting email account',400);
+        return res.status(200).json({
+            error:false,
+            message:"Email account deleted"
+        });
+    }catch(err){
+        next(err);
+    }
+}
+
+//delete calendar account(soft or hard based on usage)
+export const deleteCalendarAccount = async (req:Request,res:Response,next:NextFunction) => {
+    try{
+        const calendarAccId = req.params.id as string;
+        const userId = req.user?.id;
+        if(!userId) throw new AppError('Invalid user',400);
+        if(!calendarAccId) throw new AppError('Invalid email account',400);
+        const deletionResponse = await softOrHardDeleteCalendarAccount(userId,calendarAccId);
+        if(!deletionResponse) throw new AppError('Error deleting calendar account',400);
+        return res.status(200).json({
+            error:false,
+            message:"Calendar account deleted"
         });
     }catch(err){
         next(err);

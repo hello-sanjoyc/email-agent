@@ -21,10 +21,10 @@ const enqueueEmailJobsForAllUsers = async () => {
                         isAutomationActive:true,
                         isActive:true,                       
                         emailAccounts:{
-                            some:{isActive:true}
+                            some:{isActive:true,deletedAt:null}
                         },
                         calendarAccounts:{
-                            some:{isActive:true}
+                            some:{isActive:true,deletedAt:null}
                         },
                         subscriptions:{
                             some:{

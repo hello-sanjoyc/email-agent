@@ -100,3 +100,10 @@ export interface PriorityUpdate {
     id:string;
     priority:number;
 }
+export interface CreateEnquiryInput {
+    full_name:string;
+    email:string;
+    phone:string;
+    company:string;
+    message:string;
+}

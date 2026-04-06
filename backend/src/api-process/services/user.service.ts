@@ -16,7 +16,8 @@ export const getAccounts = async (userId:string)=> {
                 isActive:true,
                 provider:true,
                 priorityWeight:true,
-                createdAt:true
+                createdAt:true,
+                deletedAt:true
             }
         });
         if(accounts.length === 0) throw new AppError('no profiles found',404);
@@ -101,7 +102,17 @@ export const getUserProfile = async (userId:string):Promise<UserProfileData>=>{
                 isAutomationActive:true,
                 aiResponseTone:true,
                 lastAutomationRanAt:true,
-                createdAt:true
+                createdAt:true,
+                subscriptions:{
+                    where:{isActive:true},
+                    select:{
+                        id:true,
+                        startDate:true,
+                        endDate:true,
+                        isActive:true,
+                        plan:true
+                    }
+                }
             }
         });
         if(!profile) throw new AppError('no profile found',404);
@@ -144,7 +155,8 @@ export const getCalendarAccounts = async (userId:string)=> {
                 emailAddress:true,
                 isActive:true,
                 provider:true,
-                createdAt:true
+                createdAt:true,
+                deletedAt:true
             }
         });
         if(accounts.length === 0) throw new AppError('No calendar accounts found',404);
@@ -297,7 +309,6 @@ export const fetchUserByEmail = async (email:string):Promise<UserDataByEmail>=> 
         throw err;
     }
 }
-
 //update email accounts priority
 export const updateEmailAccountPriorityWeight = async (idWithPriority:PriorityUpdate[],userId:string) => {
     try{
@@ -319,6 +330,72 @@ export const updateEmailAccountPriorityWeight = async (idWithPriority:PriorityUp
         AND user_id = ${userId}
         `;
         return true;
+    }catch(err){
+        throw err;
+    }
+}
+//delete email account
+export const softOrHardDeleteEmailAccount = async (userId:string,emailAccId:string):Promise<boolean> => {
+    try{
+        const response = await db.$transaction(async (tx)=>{
+            const emailAcc = await tx.emailAccount.findFirst({
+                where:{
+                    id:emailAccId,
+                    userId
+                }
+            });
+            if(!emailAcc) throw new AppError('No email account found to delete',404);
+            const activityCount = await tx.emailActivity.count({
+                where:{emailAccountId:emailAccId,userId}
+            });
+            if(activityCount > 0){
+                await tx.emailAccount.delete({
+                    where:{id:emailAccId}
+                });                
+            }else{
+                await tx.emailAccount.update({
+                    where:{id:emailAccId},
+                    data:{
+                        deletedAt:new Date()
+                    }
+                });
+            }
+            return true;
+        });
+        return response;
+    }catch(err){
+        throw err;
+    }
+}
+//delete email account
+export const softOrHardDeleteCalendarAccount = async (userId:string,calendarAccId:string):Promise<boolean> => {
+    try{
+        const response = await db.$transaction(async (tx)=>{
+            const calendarAcc = await tx.calendarAccount.findFirst({
+                where:{
+                    id:calendarAccId,
+                    userId
+                }
+            });
+            if(!calendarAcc) throw new AppError('No calendar account found to delete',404);
+            const activityCount = await tx.emailActivity.count({
+                where:{calendarAccountId:calendarAccId,userId}
+            });
+            if(activityCount > 0){
+                await tx.calendarAccount.delete({
+                    where:{id:calendarAccId}
+                });                
+            }else{
+                await tx.calendarAccount.update({
+                    where:{id:calendarAccId},
+                    data:{
+                        deletedAt:new Date()
+                    }
+                });
+            }
+            return true;
+        });
+        return response;
     }catch(err){
         throw err;
     }

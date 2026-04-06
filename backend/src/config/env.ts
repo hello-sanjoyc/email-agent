@@ -38,7 +38,8 @@ const envSchema = z.object({
     GEMINI_MODEL:z.string().default(""),
     ACTIVE_AI_PROVIDER:z.string().default(""),
     REDIS_USERNAME:z.string().default(""),
-    REDIS_PASSWORD:z.string().default("")
+    REDIS_PASSWORD:z.string().default(""),
+    ADMIN_EMAIL:z.string().default("")
 });
 
 const env = envSchema.parse(process.env);

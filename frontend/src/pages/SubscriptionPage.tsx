@@ -67,9 +67,9 @@ export default function SubscriptionPage() {
             }
 
             const options: RazorpayModalOptions = {
-                key: import.meta.env.RAZORPAY_KEY_ID,
+                key: import.meta.env.VITE_RAZORPAY_KEY_ID,
                 subscription_id: gatewaySubscriptionId,
-                name: import.meta.env.APP_NAME,
+                name: import.meta.env.VITE_APP_NAME,
                 description: "Subscription Payment",
                 prefill: {
                     name: user?.name,

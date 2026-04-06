@@ -1,5 +1,8 @@
 import { useState } from "react";
 import type { ChangeEvent, MouseEvent } from "react";
+import api from "../../api/axios";
+import type { ApiResponse, SubmitEnquiryInput } from "../../types/billing";
+import toast from "react-hot-toast";
 interface FormData {
     name: string;
     email: string;
@@ -18,7 +21,7 @@ export default function Enquiry() {
     });
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [errors, setErrors] = useState<Partial<FormData>>({});
-
+    const [loading, setLoading] = useState<boolean>(false);
     const handleChange = (
         e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ): void => {
@@ -27,7 +30,7 @@ export default function Enquiry() {
         setErrors((prev) => ({ ...prev, [name]: "" }));
     };
 
-    const handleSubmit = (e: MouseEvent<HTMLButtonElement>): void => {
+    const handleSubmit =async (e: MouseEvent<HTMLButtonElement>): Promise<void> => {
         e.preventDefault();
         // validate
         const newErrors: Partial<FormData> = {};
@@ -58,7 +61,23 @@ export default function Enquiry() {
         if (Object.keys(newErrors).length > 0) return;
 
         // TODO: wire up to actual submission logic
-        setSubmitted(true);
+        const submitEnquiryInput:SubmitEnquiryInput ={
+            full_name:formData.name,
+            email:formData.email,
+            phone:formData.phone,
+            company:formData.company,
+            message:formData.message
+        }
+        setLoading(true);
+        try{
+            await api.post<ApiResponse<null>>('/api/v1/common/enquiry/create',submitEnquiryInput);
+            setSubmitted(true);
+        }catch(err){
+            console.error(err);
+            toast.error("Please try again");
+        }finally{
+            setLoading(false);
+        }        
     };
 
     return (
@@ -200,8 +219,9 @@ export default function Enquiry() {
                                 <button
                                     onClick={handleSubmit}
                                     className="dark-btn ml-0"
+                                    disabled={loading}
                                 >
-                                    Send Inquiry
+                                    {loading?"Sending...":"Send Inquiry"}
                                 </button>
                             </div>
                         </div>
