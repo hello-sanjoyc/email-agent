@@ -1,10 +1,10 @@
-import { fetchAiResponseToneByIDRes, PriorityUpdate } from "../controllers/v1/types";
+import { fetchAiResponseToneByIDRes, fetchAiServiceByIDRes, PriorityUpdate } from "../controllers/v1/types";
 import db from "../../db"
 import { AIResponseTone, Prisma } from "../../generated/prisma";
 import AppError from "../utils/appError.utils";
 import { LinkAccountResponse } from "./link-account/types";
 import { LinkCalendarAccountResponse } from "./link-calendar-account/types";
-import { EmailAccountData, fetchAIToneDatasetEach, UserData, UserDataByEmail, UserProfileData } from "./types";
+import { EmailAccountData, fetchAIServiceDatasetEach, fetchAIToneDatasetEach, UserData, UserDataByEmail, UserProfileData } from "./types";
 
 export const getAccounts = async (userId:string)=> {
     try{
@@ -101,6 +101,7 @@ export const getUserProfile = async (userId:string):Promise<UserProfileData>=>{
                 isActive:true,
                 isAutomationActive:true,
                 aiResponseTone:true,
+                aiServiceName:true,
                 lastAutomationRanAt:true,
                 createdAt:true,
                 subscriptions:{
@@ -455,6 +456,75 @@ export const fetchAiResponseToneByID = async (id:string):Promise<fetchAiResponse
         });
         if(!data) throw new AppError('Invalid tone',404);
         return data;
+    }catch(err){
+        throw err;
+    }
+}
+
+//fetch ai tone dataset
+export const fetchAIServicesDataset = async (userId:string):Promise<fetchAIServiceDatasetEach[]> => {
+    try{
+        const dbData = await db.$transaction(async (tx)=>{
+            const services = await tx.aIService.findMany({
+                where:{
+                    isActive:true
+                },
+                select:{
+                    id:true,
+                    name:true
+                }
+            });
+            if(services.length === 0) throw new AppError('AI services not available',404);
+            const userData = await tx.user.findUnique({
+                where:{id:userId},
+                select:{
+                    id:true,
+                    aiServiceName:true
+                }
+            });
+            if(!userData) throw new AppError('Invalid user',400);
+            return {
+                aiServiceData:services,
+                userData:userData
+            }
+        });
+         const finalDataset = dbData.aiServiceData.map((serviceData)=>{
+            return {
+                id:serviceData.id,                
+                value:serviceData.name,
+                isActive:serviceData.name === dbData.userData.aiServiceName?true:false
+            }
+        });
+        return finalDataset;        
+    }catch(err){
+        throw err;
+    }
+}
+//fetch ai service by id
+export const fetchAiServiceByID = async (id:string):Promise<fetchAiServiceByIDRes> => {
+    try{
+        const data = await db.aIService.findUnique({
+            where:{id},
+            select:{
+                id:true,
+                name:true,                
+                isActive:true
+            }
+        });
+        if(!data) throw new AppError('Invalid service',404);
+        return data;
+    }catch(err){
+        throw err;
+    }
+}
+//change the service for a user
+export const changeProfileAIService = async (id:string,aiServiceName:string):Promise<boolean> => {
+    try{
+        await db.user.update({
+            where:{id},
+            data:{aiServiceName}
+        });
+        return true;
     }catch(err){
         throw err;
     }

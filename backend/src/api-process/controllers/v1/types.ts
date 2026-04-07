@@ -113,3 +113,11 @@ export interface fetchAiResponseToneByIDRes {
     label:AIResponseToneLabel;
     isActive:boolean;
 }
+export interface ChangeAIServiceInput {
+    id:string;
+}
+export interface fetchAiServiceByIDRes {
+    id:string;
+    name:string;    
+    isActive:boolean;
+}

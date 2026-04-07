@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../../utils/appError.utils";
-import { changeProfileAIResponseTone, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, fetchAiResponseToneByID, fetchAIToneDataset, fetchEmailAccount, fetchUserData, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
-import { ChangeAIResponseToneInput, LinkAccountInput,LinkCalendarAccountInput, ToggleAutomationStatus, UpdateEmailAccountsPriorityInput, UpdateProfileInput } from "./types";
+import { changeProfileAIResponseTone, changeProfileAIService, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, fetchAiResponseToneByID, fetchAiServiceByID, fetchAIServicesDataset, fetchAIToneDataset, fetchEmailAccount, fetchUserData, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
+import { ChangeAIResponseToneInput, ChangeAIServiceInput, LinkAccountInput,LinkCalendarAccountInput, ToggleAutomationStatus, UpdateEmailAccountsPriorityInput, UpdateProfileInput } from "./types";
 import { LinkAccountFactory } from "../../services/link-account/factory";
 import { LinkCalendarAccountFactory } from "../../services/link-calendar-account/factory";
 import { isEmailUsed } from "../../services/auth.service";
@@ -277,6 +277,40 @@ export const deleteCalendarAccount = async (req:Request,res:Response,next:NextFu
         return res.status(200).json({
             error:false,
             message:"Calendar account deleted"
+        });
+    }catch(err){
+        next(err);
+    }
+}
+//get AI services for a user
+export const getAIServices = async (req:Request,res:Response,next:NextFunction) => {
+    try{
+        const userId = req.user?.id;
+        if(!userId) throw new AppError('Invalid user',400);     
+        const result = await fetchAIServicesDataset(userId);
+        return res.status(200).json({
+            error:false,
+            message:'Available AI services fetched',
+            data:result
+        });
+    }catch(err){
+        throw err;
+    }
+}
+//change AI service for a user
+export const changeAIService = async (req:Request,res:Response,next:NextFunction) => {
+    try{        
+        const input = req.body as ChangeAIServiceInput;
+        const userId = req.user?.id;
+        if(!userId) throw new AppError("Invalid user",400);
+        const serviceData = await fetchAiServiceByID(input.id);        
+        const userData = await getUserProfile(userId);
+        if(userData.aiServiceName === serviceData.name) throw new AppError("AI service already set",409);
+        await changeProfileAIService(userId,serviceData.name);
+        return res.status(200).json({
+            error:false,
+            message:`AI response tone is set to ${serviceData.name}`,
+            data:null
         });
     }catch(err){
         next(err);

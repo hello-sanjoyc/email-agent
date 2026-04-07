@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "tsx watch src/entry.ts",
-    "build":"tsc --project tsconfig.json && cp -r src/generated dist/generated"
+    "build":"tsc --project tsconfig.json"
   },
   "prisma":{
     "seed":"tsx prisma/seed.ts"

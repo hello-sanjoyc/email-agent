@@ -27,6 +27,7 @@ export interface UserProfileData {
     isActive: boolean;
     isAutomationActive:boolean;
     aiResponseTone:AIResponseTone;
+    aiServiceName:string;
     lastAutomationRanAt:Date | null;
     createdAt: Date;   
 }
@@ -132,7 +133,14 @@ export interface NewSubscriptionDataset {
 }
 
 export interface fetchAIToneDatasetEach {
+    id:string;
     label:string;
+    value:string;
+    isActive:boolean;
+}
+
+export interface fetchAIServiceDatasetEach {
+    id:string;    
     value:string;
     isActive:boolean;
 }

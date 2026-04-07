@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getProfile, getUserAccounts, linkAccount,getUserCalendarAccounts,linkCalendarAccount, toggleAccountStatus, toggleCalendarAccountStatus,getServiceStats,updateProfile, getAIResponseTones, changeAIResponseTone, toggleAutomationStatus, updateEmailAccountsPriority, deleteEmailAccount, deleteCalendarAccount } from '../../controllers/v1/user.controller.js';
+import { getProfile, getUserAccounts, linkAccount,getUserCalendarAccounts,linkCalendarAccount, toggleAccountStatus, toggleCalendarAccountStatus,getServiceStats,updateProfile, getAIResponseTones, changeAIResponseTone, toggleAutomationStatus, updateEmailAccountsPriority, deleteEmailAccount, deleteCalendarAccount, getAIServices, changeAIService } from '../../controllers/v1/user.controller.js';
 import { authenticate } from '../../middlewares/authentication.js';
 import { updateEmailAccountsPriorityValidationRules } from '../../validators/user.validator.js';
 import { checkRouteValidity } from '../../middlewares/validationMiddleware.js';
@@ -38,4 +38,8 @@ userRouter.put('/update-email-accounts-priority',authenticate,updateEmailAccount
 userRouter.delete('/email-account/:id',authenticate,deleteEmailAccount);
 //delete email account
 userRouter.delete('/calendar-account/:id',authenticate,deleteCalendarAccount);
+//get AI services
+userRouter.get('/ai-services',authenticate,getAIServices);
+//change AI response tone
+userRouter.put('/ai-service',authenticate,changeAIService);
 export default userRouter;
