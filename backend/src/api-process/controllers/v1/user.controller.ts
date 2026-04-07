@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../../utils/appError.utils";
-import { changeProfileAIResponseTone, changeProfileAIService, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, fetchAiResponseToneByID, fetchAiServiceByID, fetchAIServicesDataset, fetchAIToneDataset, fetchEmailAccount, fetchUserData, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
+import { changeProfileAIResponseTone, changeProfileAIService, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, fetchAiResponseToneByID, fetchAiServiceByID, fetchAIServicesDataset, fetchAIToneDataset, fetchEmailAccount, fetchUserData, generateStats, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
 import { ChangeAIResponseToneInput, ChangeAIServiceInput, LinkAccountInput,LinkCalendarAccountInput, ToggleAutomationStatus, UpdateEmailAccountsPriorityInput, UpdateProfileInput } from "./types";
 import { LinkAccountFactory } from "../../services/link-account/factory";
 import { LinkCalendarAccountFactory } from "../../services/link-calendar-account/factory";
@@ -120,38 +120,14 @@ export const toggleCalendarAccountStatus = async (req:Request,res:Response,next:
         next(err);
     }
 }
-//get service statistics data for a logged in user TODO: right now it is dummy data, later, change it to actual data
+//get service statistics data for a logged in user
 export const getServiceStats = async (req:Request,res:Response,next:NextFunction) => {
-    try{
-        //TODO:replace this with actual db call and actual dashboard stats data when the n8n flow is finalized
-        //TODO:also have to handle the filtration based on dates sent in query params
-        const serviceStats = [
-            {
-            'label': 'drafted',
-            'value': '2',
-            'iconKey': 'envelope'
-            },
-            {
-            'label': 'Forwarded',
-            'value': '1',
-            'iconKey': 'right_arrow'
-            },
-            {
-            'label': 'Schedule Meeting',
-            'value': '4',
-            'iconKey': 'clock'
-            },
-            {
-            'label': 'No Action',
-            'value': '3',
-            'iconKey': 'cancel'
-            },
-            {
-            'label': 'Others',
-            'value': '5',
-            'iconKey': 'others'
-            }
-        ]
+    try{        
+        const {to,from} = req.query;
+        const userId = req.user?.id;
+        if(!userId) throw new AppError("invalid user",400);
+        //find the dashboard data for this user
+        const serviceStats = await generateStats(userId,to as string,from as string);
         return res.status(200).json({
             error:false,
             message:"data fetched",

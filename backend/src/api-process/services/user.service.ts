@@ -4,7 +4,7 @@ import { AIResponseTone, Prisma } from "../../generated/prisma";
 import AppError from "../utils/appError.utils";
 import { LinkAccountResponse } from "./link-account/types";
 import { LinkCalendarAccountResponse } from "./link-calendar-account/types";
-import { EmailAccountData, fetchAIServiceDatasetEach, fetchAIToneDatasetEach, UserData, UserDataByEmail, UserProfileData } from "./types";
+import { EmailAccountData,FetchAIServiceDatasetEach,FetchAIToneDatasetEach,GenerateStatsResponse, UserData, UserDataByEmail, UserProfileData } from "./types";
 
 export const getAccounts = async (userId:string)=> {
     try{
@@ -402,7 +402,7 @@ export const softOrHardDeleteCalendarAccount = async (userId:string,calendarAccI
     }
 }
 //fetch ai tone dataset
-export const fetchAIToneDataset = async (userId:string):Promise<fetchAIToneDatasetEach[]> => {
+export const fetchAIToneDataset = async (userId:string):Promise<FetchAIToneDatasetEach[]> => {
     try{
         const dbData = await db.$transaction(async (tx)=>{
             const tones = await tx.aITone.findMany({
@@ -462,7 +462,7 @@ export const fetchAiResponseToneByID = async (id:string):Promise<fetchAiResponse
 }
 
 //fetch ai tone dataset
-export const fetchAIServicesDataset = async (userId:string):Promise<fetchAIServiceDatasetEach[]> => {
+export const fetchAIServicesDataset = async (userId:string):Promise<FetchAIServiceDatasetEach[]> => {
     try{
         const dbData = await db.$transaction(async (tx)=>{
             const services = await tx.aIService.findMany({
@@ -525,6 +525,45 @@ export const changeProfileAIService = async (id:string,aiServiceName:string):Pro
             data:{aiServiceName}
         });
         return true;
+    }catch(err){
+        throw err;
+    }
+}
+//stats label, action and iconkey mapping map
+const StatsLabelActionIconMapper:Record<string,{label:string,iconKey:string}> = {
+    no_action: {label:"No Action", iconKey:"cancel"},
+    others: {label:"Others",iconKey:"others"},
+    schedule_meeting: {label:"Schedule Meeting", iconKey:"clock"},
+    follow_up: {label:"Follow Up",iconKey:"clock"},
+    forward: {label:"Forwarded",iconKey:"right_arrow"},
+    reply:{label:"Drafted",iconKey:"envelope"}
+}
+//function to generate service stats
+export const generateStats = async (userId:string,to:string,from:string):Promise<GenerateStatsResponse[]> => {
+    try{
+        const dateFiltration:any = {};
+        //TODO: may have to change to show stats for any place's user, then we have to consider the separeate timezones too
+        //right now, only utc is done        
+        if(to) dateFiltration.gte= new Date(`${to}T23:59:59.999Z`);
+        if(from) dateFiltration.lte= new Date(`${to}T00:00:00.000Z`);
+        const emailActivityData = await db.emailActivity.groupBy({
+            by:['action'],
+            where:{
+                userId,
+                isCompleted:true,
+                ...(Object.keys(dateFiltration).length > 0 ?{processedAt:dateFiltration}:{})
+            },
+            _count:{action:true}  
+        });        
+        if(emailActivityData.length === 0) throw new AppError('Stats not found',404);
+        const response = emailActivityData.map((each)=>{
+            return {
+                label:StatsLabelActionIconMapper[each.action]?.label || 'Others',
+                iconKey:StatsLabelActionIconMapper[each.action]?.iconKey || 'others',
+                value:each._count.action
+            }
+        });
+        return response;
     }catch(err){
         throw err;
     }

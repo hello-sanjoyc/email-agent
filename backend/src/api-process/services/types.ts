@@ -132,15 +132,20 @@ export interface NewSubscriptionDataset {
     planId: string;
 }
 
-export interface fetchAIToneDatasetEach {
+export interface FetchAIToneDatasetEach {
     id:string;
     label:string;
     value:string;
     isActive:boolean;
 }
 
-export interface fetchAIServiceDatasetEach {
+export interface FetchAIServiceDatasetEach {
     id:string;    
     value:string;
     isActive:boolean;
+}
+export interface GenerateStatsResponse {
+    label:string;
+    iconKey:string;
+    value:number;
 }

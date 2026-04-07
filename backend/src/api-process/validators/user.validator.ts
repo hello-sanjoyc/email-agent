@@ -1,4 +1,4 @@
-import { body } from 'express-validator';
+import { body, query } from 'express-validator';
 export const linkAccountValidationRule = [
   body('access_token')
   .notEmpty().withMessage('Access token is required').bail(),
@@ -49,3 +49,9 @@ export const updateEmailAccountsPriorityValidationRules = [
     .isInt({min:0,max:100}).withMessage('priority needs to be an integer b/w 0 and 100').bail()
     .toInt(),
 ];
+export const getServiceStatsValidationRules = [
+  query("to").optional()
+  .isISO8601().withMessage('Invalid date format').bail(),
+  query("from").optional()
+  .isISO8601().withMessage('Invalid date format').bail()
+]

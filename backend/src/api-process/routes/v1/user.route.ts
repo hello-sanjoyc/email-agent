@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getProfile, getUserAccounts, linkAccount,getUserCalendarAccounts,linkCalendarAccount, toggleAccountStatus, toggleCalendarAccountStatus,getServiceStats,updateProfile, getAIResponseTones, changeAIResponseTone, toggleAutomationStatus, updateEmailAccountsPriority, deleteEmailAccount, deleteCalendarAccount, getAIServices, changeAIService } from '../../controllers/v1/user.controller.js';
 import { authenticate } from '../../middlewares/authentication.js';
-import { updateEmailAccountsPriorityValidationRules } from '../../validators/user.validator.js';
+import { getServiceStatsValidationRules, updateEmailAccountsPriorityValidationRules } from '../../validators/user.validator.js';
 import { checkRouteValidity } from '../../middlewares/validationMiddleware.js';
 // import { linkAccountValidationRule } from '../../validators/user.validator.js';
 // import { checkRouteValidity } from '../../middlewares/validationMiddleware.js';
@@ -25,7 +25,7 @@ userRouter.get('/profile',authenticate,getProfile);
 //editing profile data for a logged in user
 userRouter.put('/profile',authenticate,updateProfile);
 //dashboard data for a user
-userRouter.get('/service-stats',authenticate,getServiceStats);
+userRouter.get('/service-stats',authenticate,getServiceStatsValidationRules,checkRouteValidity,getServiceStats);
 //get AI response tones
 userRouter.get('/ai-response-tones',authenticate,getAIResponseTones);
 //change AI response tone
