@@ -130,3 +130,9 @@ export interface NewSubscriptionDataset {
     userId: string;
     planId: string;
 }
+
+export interface fetchAIToneDatasetEach {
+    label:string;
+    value:string;
+    isActive:boolean;
+}

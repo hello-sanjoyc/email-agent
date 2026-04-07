@@ -8,7 +8,7 @@ interface Props {
 }
 
 const isFeatured = (plan: SubscriptionPlanData): boolean =>
-  plan.name.toLowerCase().includes("plus");
+  plan.name.toLowerCase().includes("pro");
 
 export const PlanCard = ({ plan, isCurrent, onSelect, isAuthenticated }: Props) => {
   const featured = isFeatured(plan);
@@ -26,9 +26,7 @@ export const PlanCard = ({ plan, isCurrent, onSelect, isAuthenticated }: Props) 
 
   return (
     <div className={`relative flex flex-col gap-5 rounded-2xl p-7 transition-all
-      ${featured
-        ? "bg-gradient-to-br from-[#644ae9] to-[#7556ff] border-2 border-[#644ae9] shadow-2xl shadow-purple-500/25"
-        : isCurrent
+      ${ isCurrent
         ? "bg-white border-2 border-[#644ae9] shadow-md shadow-purple-100/70"
         : "bg-white border border-purple-100 shadow-sm hover:shadow-md hover:-translate-y-0.5"
       }`}
@@ -43,27 +41,25 @@ export const PlanCard = ({ plan, isCurrent, onSelect, isAuthenticated }: Props) 
       {/* Plan label + name + price */}
       <div>
         <p className={`text-xs font-mono tracking-widest uppercase mb-3
-          ${featured ? "text-purple-100" : "text-slate-500"}`}>
+          text-slate-500`}>
           {intervalLabel}
         </p>
 
         <h2 className={`text-xl font-bold mb-4 tracking-tight
-          ${featured ? "text-white" : "text-slate-900"}`}>
+          text-slate-900`}>
           {plan.name}
         </h2>
 
         <div className="flex items-baseline gap-1">
           <span className={`text-4xl font-extrabold leading-none tracking-tight
             ${isFree
-              ? featured ? "text-white" : "text-green-600"
-              : featured
-              ? "text-white"
+              ? "text-green-600"
               : "text-slate-900"
             }`}>
             {isFree ? "Free" : `₹${Number(plan.price).toLocaleString("en-IN")}`}
           </span>
           {!isFree && (
-            <span className={`text-sm ${featured ? "text-purple-200" : "text-slate-500"}`}>
+            <span className={`text-sm text-slate-500`}>
               /{plan.billingInterval === "YEAR" ? "yr" : "mo"}
             </span>
           )}
@@ -71,16 +67,16 @@ export const PlanCard = ({ plan, isCurrent, onSelect, isAuthenticated }: Props) 
       </div>
 
       {/* Divider */}
-      <div className={`h-px ${featured ? "bg-purple-300/40" : "bg-purple-100/80"}`} />
+      <div className={`h-px bg-purple-100/80`} />
 
       {/* Features */}
       <div className="flex flex-col gap-3 flex-1">
-        <FeatureRow label="AI emails" value={plan.quota.toLocaleString()} featured={featured} />
-        <FeatureRow label="Per run" value={`${plan.maxEmailsPerRun} emails`} featured={featured} />
+        <FeatureRow label="AI emails" value={plan.quota.toLocaleString()} />
+        <FeatureRow label="Per run" value={`${plan.maxEmailsPerRun} emails`} />
         {plan.gatewayTotalCount && (
-          <FeatureRow label="Billing cycles" value={`${plan.gatewayTotalCount}×`} featured={featured} />
+          <FeatureRow label="Billing cycles" value={`${plan.gatewayTotalCount}×`}/>
         )}
-        <FeatureRow label="Billing" value={plan.billingInterval} featured={featured} />
+        <FeatureRow label="Billing" value={plan.billingInterval}/>
       </div>
 
       {/* CTA button */}
@@ -108,12 +104,11 @@ export const PlanCard = ({ plan, isCurrent, onSelect, isAuthenticated }: Props) 
 interface FeatureRowProps {
   label: string;
   value: string;
-  featured: boolean;
 }
 
-const FeatureRow = ({ label, value, featured }: FeatureRowProps) => (
+const FeatureRow = ({ label, value }: FeatureRowProps) => (
   <div className="flex justify-between items-center">
-    <span className={`text-sm ${featured ? "text-purple-200" : "text-slate-500"}`}>{label}</span>
-    <span className={`text-sm font-semibold ${featured ? "text-white" : "text-slate-700"}`}>{value}</span>
+    <span className={`text-sm text-slate-500`}>{label}</span>
+    <span className={`text-sm font-semibold text-slate-700`}>{value}</span>
   </div>
 );

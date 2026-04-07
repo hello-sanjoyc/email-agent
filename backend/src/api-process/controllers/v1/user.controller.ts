@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../../utils/appError.utils";
-import { changeProfileAIResponseTone, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, fetchEmailAccount, fetchUserData, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
+import { changeProfileAIResponseTone, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, fetchAiResponseToneByID, fetchAIToneDataset, fetchEmailAccount, fetchUserData, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
 import { ChangeAIResponseToneInput, LinkAccountInput,LinkCalendarAccountInput, ToggleAutomationStatus, UpdateEmailAccountsPriorityInput, UpdateProfileInput } from "./types";
 import { LinkAccountFactory } from "../../services/link-account/factory";
 import { LinkCalendarAccountFactory } from "../../services/link-calendar-account/factory";
@@ -185,24 +185,12 @@ export const updateProfile = async (req:Request,res:Response,next:NextFunction) 
 export const getAIResponseTones = async (req:Request,res:Response,next:NextFunction) => {
     try{
         const userId = req.user?.id;
-        if(!userId) throw new AppError('Invalid user',400);
-        const userData = await getUserProfile(userId);        
-        //TODO: have to make this dynamic using a proper table for tones
+        if(!userId) throw new AppError('Invalid user',400);     
+        const result = await fetchAIToneDataset(userId);
         return res.status(200).json({
             error:false,
             message:'Available AI response tones fetched',
-            data:[
-                {
-                    label:"Professional",
-                    value:"PROFESSIONAL",
-                    isActive:userData.aiResponseTone === "PROFESSIONAL"?true:false
-                },
-                {
-                    label:"Casual",
-                    value:"CASUAL",
-                    isActive:userData.aiResponseTone === "CASUAL"?true:false
-                }
-            ]
+            data:result
         });
     }catch(err){
         next(err);
@@ -210,19 +198,17 @@ export const getAIResponseTones = async (req:Request,res:Response,next:NextFunct
 }
 //change AI response tone
 export const changeAIResponseTone = async (req:Request,res:Response,next:NextFunction) => {
-    try{
-        //TODO:have to put this available tone in a single place efficiently later , so that, changing at one place , changes at all places
-        const availableTones = ["CASUAL","PROFESSIONAL"];
+    try{        
         const input = req.body as ChangeAIResponseToneInput;
         const userId = req.user?.id;
         if(!userId) throw new AppError("Invalid user",400);
-        if(!availableTones.includes(input.tone)) throw new AppError("Invalid tone",400);
+        const toneData = await fetchAiResponseToneByID(input.id);        
         const userData = await getUserProfile(userId);
-        if(userData.aiResponseTone === input.tone) throw new AppError("Response tone already set",409);
-        await changeProfileAIResponseTone(userId,input.tone);
+        if(userData.aiResponseTone === toneData.tone) throw new AppError("Response tone already set",409);
+        await changeProfileAIResponseTone(userId,toneData.tone);
         return res.status(200).json({
             error:false,
-            message:`AI response tone is set to ${input.tone}`
+            message:`AI response tone is set to ${toneData.tone}`
         });
     }catch(err){
         next(err);
@@ -279,7 +265,6 @@ export const deleteEmailAccount = async (req:Request,res:Response,next:NextFunct
         next(err);
     }
 }
-
 //delete calendar account(soft or hard based on usage)
 export const deleteCalendarAccount = async (req:Request,res:Response,next:NextFunction) => {
     try{

@@ -4,8 +4,8 @@ import { GeminiService } from "./providers/gemini.provider";
 import { GroqService } from "./providers/groq.provider";
 
 export class AIServiceFactory{
-    static getProvider():IAiService{
-        const aiProvider = env.ACTIVE_AI_PROVIDER || "GROQ"
+    static getProvider(name:string):IAiService{
+        const aiProvider = name.toUpperCase() || "GEMINI"
         let providerInstance:IAiService;
         switch(aiProvider){
             case "GEMINI":
@@ -15,7 +15,7 @@ export class AIServiceFactory{
                 providerInstance = new GroqService();
                 break;
             default:
-                providerInstance = new GroqService();    
+                providerInstance = new GeminiService();    
         }
         return providerInstance;
     }

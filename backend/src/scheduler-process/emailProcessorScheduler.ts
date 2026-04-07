@@ -4,12 +4,17 @@ import { logger } from "../config/logger";
 import { EmailProcessingPayload } from "./types";
 import env from "../config/env";
 import { getEmailProcessingQueue } from "../queues/emailProcessingQueue";
-let scheduledTask:ScheduledTask|null = null;
+let scheduledPlusTask:ScheduledTask|null = null;
+let scheduledProTask:ScheduledTask|null = null;
+let scheduledTrialTask:ScheduledTask|null= null;
 const BATCH_SIZE = 100;
 const FOUR_HOURS_MS = 4 * 60 * 60 * 1000;
+const ONE_HOUR_MS = 1 * 60 * 60 * 1000;
+const EIGHT_HOURS_MS = 8 * 60 * 60 * 1000;
 let isProcessShuttingDown = false;
-const enqueueEmailJobsForAllUsers = async () => {
+const enqueueEmailJobsForAllUsers = async (plan:"Pro"|"Plus"|"Trial",intervalMS:number) => {
     try{
+        const planNames = plan !== "Trial" ? [`${plan} Monthly`,`${plan} Yearly`]:[plan];
         let emailProcessingQueue = getEmailProcessingQueue();
         let skip = 0;
         let hasMore = true;
@@ -29,7 +34,8 @@ const enqueueEmailJobsForAllUsers = async () => {
                         subscriptions:{
                             some:{
                                 isActive:true,
-                                endDate:{gte:new Date()}
+                                endDate:{gte:new Date()},
+                                plan:{name:{in:planNames}}
                             }
                         }
                     },
@@ -43,9 +49,10 @@ const enqueueEmailJobsForAllUsers = async () => {
                         isActive:true,
                         isAutomationActive:true,
                         aiResponseTone:true,
+                        aiServiceName:true,
                         lastAutomationRanAt:true,
                         emailAccounts:{
-                            where:{isActive:true},
+                            where:{isActive:true,deletedAt:null},
                             select:{
                                 id:true,
                                 emailAddress:true,
@@ -61,7 +68,7 @@ const enqueueEmailJobsForAllUsers = async () => {
                             }
                         },
                         calendarAccounts:{
-                            where:{isActive:true},
+                            where:{isActive:true,deletedAt:null},
                             select:{
                                 id:true,
                                 emailAddress:true,
@@ -76,7 +83,8 @@ const enqueueEmailJobsForAllUsers = async () => {
                                 isActive:true,
                                 endDate:{
                                     gt: new Date()
-                                }
+                                },
+                                plan:{name:{in:planNames}}
                             },
                             orderBy:{
                                 createdAt:"desc"
@@ -135,7 +143,7 @@ const enqueueEmailJobsForAllUsers = async () => {
                 const totalEmailAccountPriorityWeight = eachUser.emailAccounts.reduce((counter,each)=>{
                     return counter + each.priorityWeight;
                 },0);
-                const currentBlock = Math.floor(Date.now()/FOUR_HOURS_MS);                        
+                const currentBlock = Math.floor(Date.now()/intervalMS);                        
                 const queuAdditionJobs = eachUser.emailAccounts.map((eachEmailAccount)=>{
                     const throttle = Math.floor((eachEmailAccount.priorityWeight/totalEmailAccountPriorityWeight)*eachUser.subscriptions[0].plan.maxEmailsPerRun);
                     let processQuantity = Math.min(throttle,leftQuota);
@@ -166,6 +174,8 @@ const enqueueEmailJobsForAllUsers = async () => {
                         },
                         general_data:{
                             user_id:eachUser.id,
+                            ai_response_tone:eachUser.aiResponseTone,
+                            ai_service_name:eachUser.aiServiceName,
                             plan_id:eachUser.subscriptions[0].plan.id,
                             subscription_id:eachUser.subscriptions[0].id,
                             email_account_id:eachEmailAccount.id,
@@ -203,13 +213,23 @@ const enqueueEmailJobsForAllUsers = async () => {
 }
 
 export const initEmailProcessorScheduler = () => {
-    scheduledTask = cron.schedule("0 */4 * * *",enqueueEmailJobsForAllUsers);  //0 */3 * * * this is for 3 hour interval  0 */4 * * *   this is for 4 hour interval */5 * * * *
+    scheduledPlusTask = cron.schedule("0 */4 * * *",() => enqueueEmailJobsForAllUsers("Plus",FOUR_HOURS_MS));
+    scheduledProTask = cron.schedule("0 * * * *",() => enqueueEmailJobsForAllUsers("Pro",ONE_HOUR_MS));
+    scheduledTrialTask = cron.schedule("0 */8 * * *",()=>enqueueEmailJobsForAllUsers("Trial",EIGHT_HOURS_MS));
     logger.info('[EMAIL-PROCESSOR-SCHEDULAR] scheduled');
 }
 export const closeEmailProcessorScheduler = () => {
     isProcessShuttingDown = true;
-    if(scheduledTask){
-        scheduledTask.stop();        
-        scheduledTask = null;
+    if(scheduledPlusTask){
+        scheduledPlusTask.stop();        
+        scheduledPlusTask = null;
+    }
+    if(scheduledProTask){
+        scheduledProTask.stop();        
+        scheduledProTask = null;
+    }
+    if(scheduledTrialTask){
+        scheduledTrialTask.stop();        
+        scheduledTrialTask = null;
     }
 }

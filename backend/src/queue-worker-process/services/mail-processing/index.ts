@@ -6,7 +6,6 @@ import { ActionResultBagItem, CreateEventInput , ImapCreateReplyInput, MarkAsRea
 import * as imaps from 'imap-simple';
 import { AIServiceFactory } from "./ai/ai.factory";
 const auth = new AuthService();
-const ai = AIServiceFactory.getProvider();
 const calendar = new CalendarService();
 const email = new EmailService();
 const isProvider = (value:string) => {
@@ -15,7 +14,9 @@ const isProvider = (value:string) => {
 export const processEmail = async (payload:EmailProcessingPayload):Promise<ProcessEmailResponse> => {
     let subjectImapConnection:imaps.ImapSimple | null = null;
     try{
-        const { n8n_payload } = payload;
+        const { n8n_payload, general_data } = payload;
+        //ai instance setup based on the user's provider selection
+        const ai = AIServiceFactory.getProvider(general_data.ai_service_name);
         //provider type safety check
         if(!isProvider(n8n_payload.subject_provider)){
             return {

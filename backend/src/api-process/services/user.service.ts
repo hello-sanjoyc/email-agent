@@ -1,10 +1,10 @@
-import { PriorityUpdate } from "../controllers/v1/types";
+import { fetchAiResponseToneByIDRes, PriorityUpdate } from "../controllers/v1/types";
 import db from "../../db"
 import { AIResponseTone, Prisma } from "../../generated/prisma";
 import AppError from "../utils/appError.utils";
 import { LinkAccountResponse } from "./link-account/types";
 import { LinkCalendarAccountResponse } from "./link-calendar-account/types";
-import { EmailAccountData, UserData, UserDataByEmail, UserProfileData } from "./types";
+import { EmailAccountData, fetchAIToneDatasetEach, UserData, UserDataByEmail, UserProfileData } from "./types";
 
 export const getAccounts = async (userId:string)=> {
     try{
@@ -396,6 +396,65 @@ export const softOrHardDeleteCalendarAccount = async (userId:string,calendarAccI
             return true;
         });
         return response;
+    }catch(err){
+        throw err;
+    }
+}
+//fetch ai tone dataset
+export const fetchAIToneDataset = async (userId:string):Promise<fetchAIToneDatasetEach[]> => {
+    try{
+        const dbData = await db.$transaction(async (tx)=>{
+            const tones = await tx.aITone.findMany({
+                where:{
+                    isActive:true
+                },
+                select:{
+                    id:true,
+                    tone:true,
+                    label:true
+                }
+            });
+            if(tones.length === 0) throw new AppError('AI response tones not available',404);
+            const userData = await tx.user.findUnique({
+                where:{id:userId},
+                select:{
+                    id:true,
+                    aiResponseTone:true
+                }
+            });
+            if(!userData) throw new AppError('Invalid user',400);
+            return {
+                toneData:tones,
+                userData:userData
+            }
+        });
+         const finalDataset = dbData.toneData.map((tone)=>{
+            return {
+                id:tone.id,
+                label:tone.label,
+                value:tone.tone,
+                isActive:tone.tone === dbData.userData.aiResponseTone?true:false
+            }
+        });
+        return finalDataset;        
+    }catch(err){
+        throw err;
+    }
+}
+//fetch ai response tone by id
+export const fetchAiResponseToneByID = async (id:string):Promise<fetchAiResponseToneByIDRes> => {
+    try{
+        const data = await db.aITone.findUnique({
+            where:{id},
+            select:{
+                id:true,
+                tone:true,
+                label:true,
+                isActive:true
+            }
+        });
+        if(!data) throw new AppError('Invalid tone',404);
+        return data;
     }catch(err){
         throw err;
     }

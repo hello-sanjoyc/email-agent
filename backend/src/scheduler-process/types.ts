@@ -10,6 +10,8 @@ export interface GeneralData {
   subscription_id:string;
   email_account_id:string;
   calendar_account_id:string;
+  ai_response_tone:string;
+  ai_service_name:string;
 }
 export interface N8NPayload {
   process_quantity:number;

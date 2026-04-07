@@ -6,6 +6,8 @@ export interface EmailProcessingPayload {
 }
 export interface GeneralData {
   user_id:string;
+  ai_response_tone:string;
+  ai_service_name:string;
   plan_id:string;
   subscription_id:string;
   email_account_id:string;

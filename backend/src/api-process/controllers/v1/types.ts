@@ -1,4 +1,4 @@
-import { AIResponseTone } from "../../../generated/prisma";
+import { AIResponseTone, AIResponseToneLabel } from "../../../generated/prisma";
 
 export interface LinkAccountInput {
     access_token: string;
@@ -26,7 +26,7 @@ export interface UpdateProfileInput {
     phone:string;
 }
 export interface ChangeAIResponseToneInput {
-    tone:AIResponseTone;
+    id:string;
 }
 export interface ToggleAutomationStatus {
     status:boolean
@@ -106,4 +106,10 @@ export interface CreateEnquiryInput {
     phone:string;
     company:string;
     message:string;
+}
+export interface fetchAiResponseToneByIDRes {
+    id:string;
+    tone:AIResponseTone;
+    label:AIResponseToneLabel;
+    isActive:boolean;
 }
