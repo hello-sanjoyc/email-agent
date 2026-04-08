@@ -5,12 +5,13 @@ interface Props {
   isCurrent: boolean;
   onSelect: (id: string) => void;
   isAuthenticated:boolean;
+  isUnderASubscription:boolean;
 }
 
 const isFeatured = (plan: SubscriptionPlanData): boolean =>
   plan.name.toLowerCase().includes("pro");
 
-export const PlanCard = ({ plan, isCurrent, onSelect, isAuthenticated }: Props) => {
+export const PlanCard = ({ plan, isCurrent, onSelect, isAuthenticated, isUnderASubscription }: Props) => {
   const featured = isFeatured(plan);
   const isFree = Number(plan.price) === 0;
 
@@ -18,11 +19,7 @@ export const PlanCard = ({ plan, isCurrent, onSelect, isAuthenticated }: Props) 
     plan.billingInterval === "YEAR" ? "Yearly" :
     plan.billingInterval === "TRIAL" ? "Free forever" : "Monthly";
 
-  const ctaLabel = isCurrent
-    ? "Current plan"
-    : isFree
-    ? "Start free"
-    : "Upgrade now";
+  const ctaLabel = isCurrent ? "Current plan": (isFree ? "Start free":(isUnderASubscription?"Change plan": "Upgrade now"));
 
   return (
     <div className={`relative flex flex-col gap-5 rounded-2xl p-7 transition-all
@@ -86,12 +83,8 @@ export const PlanCard = ({ plan, isCurrent, onSelect, isAuthenticated }: Props) 
           disabled={isCurrent}
           className={`w-full py-3 rounded-xl text-sm font-bold transition-all
             ${isCurrent
-              ? featured
-                ? "bg-purple-400/30 text-purple-200 cursor-not-allowed"
-                : "bg-slate-100 text-slate-300 cursor-not-allowed"
-              : featured
-              ? "bg-white text-[#644ae9] hover:bg-purple-50 shadow-lg"
-              : "bg-[#644ae9] text-white hover:brightness-110 shadow-lg shadow-purple-500/20"
+              ?"bg-purple-400/30 text-white-200 cursor-not-allowed"                
+              :"bg-[#644ae9] text-white hover:brightness-110 shadow-lg shadow-purple-500/20"
             }`}
         >
           {ctaLabel}

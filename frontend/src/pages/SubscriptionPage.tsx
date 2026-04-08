@@ -219,6 +219,7 @@ export default function SubscriptionPage() {
                                     isCurrent={activeSub?.planId === plan.id}
                                     onSelect={handlePlanSelect}
                                     isAuthenticated={isAuthenticatedUser}
+                                    isUnderASubscription={activeSub?true:false}
                                 />
                             ))}
                         </div>

@@ -28,7 +28,8 @@ export const getAccounts = async (userId:string)=> {
                 isActive:account.isActive,
                 provider:account.provider,
                 priority:account.priorityWeight,
-                createdAt:account.createdAt
+                createdAt:account.createdAt,
+                deletedAt:account.deletedAt
             }
         });
         return accountData;
@@ -167,7 +168,8 @@ export const getCalendarAccounts = async (userId:string)=> {
                 email:account.emailAddress,
                 isActive:account.isActive,
                 provider:account.provider,
-                createdAt:account.createdAt
+                createdAt:account.createdAt,
+                deletedAt:account.deletedAt
             }
         });
         return accountData;
@@ -349,7 +351,7 @@ export const softOrHardDeleteEmailAccount = async (userId:string,emailAccId:stri
             const activityCount = await tx.emailActivity.count({
                 where:{emailAccountId:emailAccId,userId}
             });
-            if(activityCount > 0){
+            if(activityCount === 0){
                 await tx.emailAccount.delete({
                     where:{id:emailAccId}
                 });                
@@ -382,7 +384,7 @@ export const softOrHardDeleteCalendarAccount = async (userId:string,calendarAccI
             const activityCount = await tx.emailActivity.count({
                 where:{calendarAccountId:calendarAccId,userId}
             });
-            if(activityCount > 0){
+            if(activityCount === 0){
                 await tx.calendarAccount.delete({
                     where:{id:calendarAccId}
                 });                
