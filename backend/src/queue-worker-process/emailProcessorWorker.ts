@@ -5,6 +5,7 @@ import {redisConnection} from "../config/redis";
 import db from "../db";
 import { processEmail } from "./services/mail-processing";
 import { ActionResultBagItem } from "./services/mail-processing/types";
+import { ActionItemPriority } from "../generated/prisma";
 
 const WORKER_CONCURRENCY = 5;
 //worker function for the email processing worker
@@ -40,10 +41,31 @@ const processEmailJobs = async (job:Job<EmailProcessingPayload>):Promise<void> =
         //if we receive any action array at all, we will go for some insert and update operation
         if(responseData.length > 0){
             await db.$transaction(async (tx)=>{
-                //insert those actions of messages
-                await tx.emailActivity.createMany({
-                    data:emailActivityMultiDataset
+                //insert each of the email activities separately, to get the inserted data
+                const createdActivities = await Promise.all(
+                    emailActivityMultiDataset.map((each)=>tx.emailActivity.create({data:each}))
+                );
+                const actionItemsToInsert = createdActivities.flatMap((createdActivity) => {
+                    const matchingResult = responseData.find(
+                        (r) => r.messageID === createdActivity.messageId
+                    );
+                    if (!matchingResult || matchingResult.actionItems.length === 0) {
+                        return []; // flatMap skips empty arrays, so this message is just ignored
+                    }
+                    return matchingResult.actionItems.map((item) => ({
+                        emailActivityId: createdActivity.id,
+                        summary: item.summary,
+                        deadline: item.deadline ? new Date(item.deadline) : null,
+                        // The AI returns lowercase ("high") but Prisma enum is uppercase (HIGH)
+                        priority: item.priority.toUpperCase() as ActionItemPriority,
+                        status: 'PENDING' as const,
+                    }));
                 });
+                 if (actionItemsToInsert.length > 0) {
+                    await tx.actionItem.createMany({
+                        data: actionItemsToInsert,
+                    });
+                }                
                 //update count for those actions which are performed successfully(completed)
                 await tx.subscription.update({
                     where:{

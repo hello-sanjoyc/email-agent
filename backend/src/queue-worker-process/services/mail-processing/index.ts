@@ -118,14 +118,16 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                             action:actionObject.action,
                             messageID:msg.messageID,
                             reason:actionObject.reason,
-                            isCompleted:true
+                            isCompleted:true,
+                            actionItems:actionObject.action_items ?? []
                         };
                     }else{
                          actionResult ={
                             action:actionObject.action,
                             messageID:msg.messageID,
                             reason:actionObject.reason,
-                            isCompleted:false
+                            isCompleted:false,
+                            actionItems:actionObject.action_items ?? []
                         };
                     }
                     break;
@@ -153,14 +155,16 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                             action:actionObject.action,
                             messageID:msg.messageID,
                             reason:actionObject.reason,
-                            isCompleted:true
+                            isCompleted:true,
+                            actionItems:actionObject.action_items ?? []
                         };
                     }else{
                         actionResult ={
                             action:actionObject.action,
                             messageID:msg.messageID,
                             reason:actionObject.reason,
-                            isCompleted:false
+                            isCompleted:false,
+                            actionItems:actionObject.action_items ?? []
                         };
                     }
                     break;
@@ -194,14 +198,16 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                             action:actionObject.action,
                             messageID:msg.messageID,
                             reason:actionObject.reason,
-                            isCompleted:true
+                            isCompleted:true,
+                            actionItems:actionObject.action_items ?? []
                         };
                     }else{
                         actionResult ={
                             action:actionObject.action,
                             messageID:msg.messageID,
                             reason:actionObject.reason,
-                            isCompleted:false
+                            isCompleted:false,
+                            actionItems:actionObject.action_items ?? []
                         };
                     }
                     break;
@@ -252,14 +258,16 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                             action:actionObject.action,
                             messageID:msg.messageID,
                             reason:actionObject.reason,
-                            isCompleted:true
+                            isCompleted:true,
+                            actionItems:actionObject.action_items ?? []
                         };
                     }else{
                         actionResult ={
                             action:actionObject.action,
                             messageID:msg.messageID,
                             reason:actionObject.reason,
-                            isCompleted:false
+                            isCompleted:false,
+                            actionItems:actionObject.action_items ?? []
                         };
                     }
                     break;
@@ -269,7 +277,8 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         action:actionObject.action,
                         messageID:msg.messageID,
                         reason:actionObject.reason,
-                        isCompleted:true
+                        isCompleted:true,
+                        actionItems:actionObject.action_items ?? []
                     };
                     break;
                 case "other":
@@ -278,7 +287,8 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         action:actionObject.action,
                         messageID:msg.messageID,
                         reason:actionObject.reason,
-                        isCompleted:true
+                        isCompleted:true,
+                        actionItems:actionObject.action_items ?? []
                     };
                     break;
                 default:
@@ -286,7 +296,8 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         action:actionObject.action,
                         messageID:msg.messageID,
                         reason:actionObject.reason,
-                        isCompleted:true
+                        isCompleted:true,
+                        actionItems:actionObject.action_items ?? []
                     }                    
             }
             //mark the message as read if the action that was decided for that message is successfully completed

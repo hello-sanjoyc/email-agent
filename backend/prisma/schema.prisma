@@ -180,6 +180,7 @@ model EmailActivity {
   emailAccount EmailAccount @relation(fields: [emailAccountId],references: [id])
   plan SubscriptionPlan @relation(fields: [planId], references: [id])
   subscription Subscription @relation(fields: [subscriptionId], references: [id])
+  actionItems ActionItem[] 
   @@map("email_activities")
 }
 
@@ -230,4 +231,31 @@ model AIService {
   isActive Boolean @db.Boolean @default(true) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
   @@map("ai_services")
+}
+model ActionItem {
+  id              String           @id @default(uuid()) @db.Uuid @map("id")
+  emailActivityId String           @db.Uuid @map("email_activity_id")
+  summary         String           @db.VarChar(300) @map("summary")
+  deadline        DateTime?        @map("deadline")
+  priority        ActionItemPriority @map("priority")
+  status          ActionItemStatus @default(PENDING) @map("status")
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  emailActivity   EmailActivity    @relation(fields: [emailActivityId], references: [id], onDelete: Cascade)
+
+  @@index([emailActivityId])
+  @@map("action_items")
+}
+
+enum ActionItemPriority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum ActionItemStatus {
+  PENDING
+  DONE
+  DISMISSED
 }

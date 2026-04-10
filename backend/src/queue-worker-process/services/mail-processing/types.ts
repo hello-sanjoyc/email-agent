@@ -1,5 +1,6 @@
 import { ImapSimpleOptions } from "imap-simple";
 import * as imaps from "imap-simple";
+import { ActionItemPriority } from "../../../generated/prisma";
 
 export interface MicrosoftGetMessageResponse {
      "@odata.context": string;
@@ -161,13 +162,20 @@ export interface EmailClassificationOutput {
     reply_subject: string;
     reply_text: string;    
     forward_receiver_email: string[];   
-    forward_text: string;    
+    forward_text: string;
+    action_items: ActionItem[];    
+}
+export interface ActionItem {
+    summary: string;
+    deadline: string | null;  // ISO string from AI; converted to Date only at DB insert time
+    priority: ActionItemPriority;
 }
 export interface ActionResultBagItem {
     isCompleted:boolean;
     messageID:string;
     action:string;
     reason:string;
+    actionItems: ActionItem[];
 }
 export interface ProcessEmailResponse {
     error:boolean;

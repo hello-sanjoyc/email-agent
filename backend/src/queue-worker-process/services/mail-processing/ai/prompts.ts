@@ -24,6 +24,17 @@ FIELD MAPPING:
 - follow_up: follow_up_title, follow_up_description, follow_up_start_datetime, follow_up_end_datetime
 - no_action/other: no detail fields needed
 
+ACTION_ITEMS RULES:
+- action_items is an array of tasks the recipient personally needs to act on, extracted from the email.
+- Populate action_items regardless of the value of "action" — a no_action email can still have action items.
+- Only include items that require a clear, concrete human action (e.g. pay a bill, sign a form, RSVP, book something).
+- Do NOT create action items for purely informational content (e.g. a newsletter, a shipping notification with no decision needed, an OTP).
+- Each item has:
+    - "summary": A concise 1–2 line description of the task. Include the deadline inline if known (e.g. "Pay $450 daycare invoice — due EOD"). Max 300 characters.
+    - "deadline": ISO datetime in UTC (00:00:00) if a date or relative timeframe is mentioned; resolve relative dates against the email's received date. Use null if no deadline is found.
+    - "priority": "high" if deadline is within 24 hours or email uses urgent language; "medium" for deadlines within 7 days; "low" for everything else or no deadline.
+- If no actionable tasks exist, return an empty array: [].
+
 OUTPUT SCHEMA:
 {
   "action": "",
@@ -40,7 +51,14 @@ OUTPUT SCHEMA:
   "reply_subject": "",
   "reply_text": "", 
   "forward_receiver_email": [], 
-  "forward_text": ""
+  "forward_text": "",
+  "action_items": [
+    {
+      "summary": "",
+      "deadline": null,
+      "priority": ""
+    }
+  ]
 }
 
-Populate action and reason always. Populate only the fields mapped to the chosen action. Leave all other detail fields as empty strings. forward_receiver_email is always an array. Include every key.`;    
+Populate action and reason always. Populate only the fields mapped to the chosen action. Leave all other detail fields as empty strings. forward_receiver_email is always an array. action_items is always an array (empty if none). Include every key.`;
