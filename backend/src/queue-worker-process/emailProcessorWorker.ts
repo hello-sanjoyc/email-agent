@@ -15,7 +15,7 @@ const processEmailJobs = async (job:Job<EmailProcessingPayload>):Promise<void> =
         const response =await processEmail(job.data);
         //see if error came during processing
         if(response.error){
-            throw new Error(response.message);
+            throw response.errorObj;
         }
         //get the actionresult array containing action result for the messages
         let responseData:ActionResultBagItem[]=response.data;

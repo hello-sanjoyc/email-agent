@@ -323,6 +323,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
         return {
             error:true,
             message:"Internal server error: "+(err instanceof Error?err.message:'unknown'),
+            errorObj: err instanceof Error? err:null,
             data:[]
         }
     }finally{

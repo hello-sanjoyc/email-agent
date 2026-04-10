@@ -180,5 +180,6 @@ export interface ActionResultBagItem {
 export interface ProcessEmailResponse {
     error:boolean;
     message:string;
-    data:ActionResultBagItem[]
+    data:ActionResultBagItem[];
+    errorObj?:Error | null;
 }
