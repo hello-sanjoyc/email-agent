@@ -570,3 +570,62 @@ export const generateStats = async (userId:string,to:string,from:string):Promise
         throw err;
     }
 }
+
+//get data for manual trigger
+export const getDataForManualTrigger = async (userId:string,emailAccId:string) => {
+    try{
+        const userDataWithEmailAndCalendarAcc = await db.user.findFirst(
+            {
+                where:{
+                    id:userId,
+                    isAutomationActive:true,
+                    isActive:true,                 
+                },
+                select:{
+                    id:true,
+                    name:true,
+                    email:true,
+                    phone:true,
+                    isActive:true,
+                    isAutomationActive:true,
+                    aiResponseTone:true,
+                    aiServiceName:true,
+                    lastAutomationRanAt:true,
+                    emailAccounts:{
+                        where:{isActive:true,deletedAt:null,id:emailAccId},
+                        select:{
+                            id:true,
+                            emailAddress:true,
+                            appPassword:true,
+                            accessToken:true,
+                            refreshToken:true,
+                            smtpHost:true,
+                            smtpPort:true,
+                            imapHost:true,
+                            imapPort:true,
+                            provider:true,
+                            priorityWeight:true
+                        }
+                    },
+                    calendarAccounts:{
+                        where:{isActive:true,deletedAt:null},
+                        select:{
+                            id:true,
+                            emailAddress:true,
+                            accessToken:true,
+                            refreshToken:true,
+                            provider:true,
+                            isActive:true
+                        }
+                    },                  
+                }
+            },
+        );
+        if(!userDataWithEmailAndCalendarAcc) throw new AppError('No valid user found',404);
+        if(userDataWithEmailAndCalendarAcc.emailAccounts.length === 0) throw new AppError('Email Account not found',404);
+        if(userDataWithEmailAndCalendarAcc.calendarAccounts.length === 0) throw new AppError('Calendar Account not found',404);
+
+    }catch(err){
+
+    }
+}

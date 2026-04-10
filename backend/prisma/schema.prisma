@@ -86,6 +86,7 @@ model EmailAccount {
   provider String @db.VarChar(80) @default("custom") @map("provider")
   priorityWeight Int @db.Integer @default(100) @map("priority_weight")
   isActive Boolean @db.Boolean @default(false) @map("is_active")
+  isManuallyTriggered Boolean @db.Boolean @default(false) @map("is_manually_triggered")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")

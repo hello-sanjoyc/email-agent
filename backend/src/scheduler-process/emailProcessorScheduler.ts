@@ -106,10 +106,17 @@ const enqueueEmailJobsForAllUsers = async (plan:"Pro"|"Plus"|"Trial",intervalMS:
             );
             //if no users found, just stop there
             if(allUsersWithEmailAndCalendarAccounts.length === 0){            
-                logger.info(`[EMAIL-PROCESSING-SCHEDULING] No users found to process, skipping schedular...`);
+                logger.info(`[EMAIL-PROCESSING-SCHEDULING] No users found to process, skipping schedular...`,{
+                    plan,
+                    planNames:JSON.stringify(planNames)
+                });
                 hasMore=false;
                 break;
-            }            
+            }
+            logger.info(`[EMAIL-PROCESSING-SCHEDULING] Found ${allUsersWithEmailAndCalendarAccounts.length} users to process`, {
+                plan,
+                skip
+            });            
             for(let eachUser of allUsersWithEmailAndCalendarAccounts){                                               
                 if(eachUser.subscriptions[0].currentUsageCount >= eachUser.subscriptions[0].plan.quota){
                     logger.info(`[EMAIL-PROCESSING-SCHEDULING] Quota exhausted for current subscription for user with id ${eachUser.id}, skipping user...`);

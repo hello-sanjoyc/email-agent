@@ -292,3 +292,15 @@ export const changeAIService = async (req:Request,res:Response,next:NextFunction
         next(err);
     }
 }
+//function to trigger manual email activity (will not consider plan)
+export const triggerEmailActivity = async (req:Request,res:Response,next:NextFunction) => {
+    // try{
+    //     const emailAccId = req.params.id as string;
+    //     const userId = req.user?.id;
+    //     if(!userId) throw new AppError('Invalid user',400);
+    //     if(!emailAccId) throw new AppError('Invalid email account',400);
+    //     const data = await getDataForManualTrigger(userId,emailAccId); 
+    // }catch(err){
+    //     next(err);
+    // }
+}
