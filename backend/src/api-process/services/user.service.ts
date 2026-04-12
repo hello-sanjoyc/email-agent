@@ -40,7 +40,7 @@ export const getAccounts = async (userId:string)=> {
 export const createEmailAccount = async (providerResponse:LinkAccountResponse,userId:string):Promise<boolean> => {
     try{
         return await db.$transaction(async(tx)=>{
-            const existingEmailAccounts =await tx.emailAccount.findMany();
+            const existingEmailAccounts =await tx.emailAccount.findMany({where:{userId}});
             const isAccountWithSameMail = existingEmailAccounts.some((each)=>each.emailAddress === providerResponse.email);
             if(isAccountWithSameMail) throw new AppError('Email account already exists',409);
             await tx.emailAccount.create({

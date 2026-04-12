@@ -18,10 +18,10 @@ export class GoogleProvider implements AccountLinkProvider{
                 refreshToken:payload.refresh_token,
                 email:profile.email,
                 password:null,
-                imap_host:null,
-                imap_port:null,
-                smtp_host:null,
-                smtp_port:null,
+                imap_host:'imap.gmail.com',
+                imap_port:993,
+                smtp_host:'smtp.gmail.ocm',
+                smtp_port:465,
                 provider:"google"
             } 
             return response;
