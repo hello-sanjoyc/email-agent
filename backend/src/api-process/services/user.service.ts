@@ -7,7 +7,7 @@ import { LinkCalendarAccountResponse } from "./link-calendar-account/types";
 import { EmailAccountData,FetchAIServiceDatasetEach,FetchAIToneDatasetEach,GenerateStatsResponse, UserData, UserDataByEmail, UserProfileData } from "./types";
 import { EmailProcessingPayload } from "../../types/types";
 import env from "../../config/env";
-import { emailProcessingQueue } from "../../queues/emailProcessingQueue";
+import { emailProcessingQueue, getEmailProcessingQueue } from "../../queues/emailProcessingQueue";
 import { logger } from "../../config/logger";
 
 export const getAccounts = async (userId:string)=> {
@@ -598,6 +598,7 @@ export const generateStats = async (userId:string,to:string,from:string):Promise
 //get data for manual trigger(for internal call in this user service. when new email account is created)
 export const triggerEmailProcessingManually = async (userId:string,emailAccId:string):Promise<void> => {
     try{
+        let emailProcessingQueue = getEmailProcessingQueue();
         const allInFlightJobs = await emailProcessingQueue.getJobs(['waiting','active']);
         const isActiveJobPresent = allInFlightJobs.some((each)=>{
             return (each.data.general_data.user_id === userId && each.data.general_data.email_account_id === emailAccId)

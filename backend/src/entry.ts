@@ -29,6 +29,7 @@ const bootstrap = async () => {
         switch(env.PROCESS_TYPE){
             case 'API':
                 initEmailSendingQueue();
+                initEmailProcessingQueue();
                 initRazorpayWebhookProcessingQueue();  
                 await startAPIServer();
                 break;
