@@ -37,7 +37,7 @@ export interface ReadImapMessagesInput {
     authString:string;
     subject_imap_url:string;
     subject_imap_port:number;
-    subscription_date:Date;
+    subscription_date:Date | string;
     readCount:number;
     provider:Provider;
 }

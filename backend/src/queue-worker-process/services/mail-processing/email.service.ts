@@ -8,14 +8,15 @@ import { FormatAddressInput, ImapConfigWithOauth, ImapCreateReplyInput, ImapRead
 import {v4 as uuidv4} from 'uuid';
 
 export class EmailService {
-    private formatImapDate(date:Date):string{
+    private formatImapDate(date:Date | string):string{
         const months= [
             "Jan", "Feb", "Mar", "Apr", "May", "Jun",
             "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
         ];
-        const day = String(date.getDate()).padStart(2,'0');
-        const month = months[date.getMonth()];
-        const year = String(date.getFullYear());
+        const d = date instanceof Date ? date: new Date(date);
+        const day = String(d.getDate()).padStart(2,'0');
+        const month = months[d.getMonth()];
+        const year = String(d.getFullYear());
         return `${day}-${month}-${year}`;
     }    
     private formatAddress (addrObj:FormatAddressInput){

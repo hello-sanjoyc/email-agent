@@ -17,7 +17,7 @@ export interface N8NPayload {
   calendar_mail:string;
   calendar_refresh_token:string;
   calendar_provider:string; 
-  subscription_date:Date;
+  subscription_date:Date | string;
   google_project_client_id:string;
   google_project_client_secret:string;
   microsoft_project_client_id:string;
