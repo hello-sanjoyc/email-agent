@@ -89,6 +89,8 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
         let actionResultBag:ActionResultBagItem[]=[];
         let actionResult:ActionResultBagItem;
         for(let msg of messages){
+            //extract the message id. it seems like it is coming as array in runtime for IMAP cases. so we will handle both to clarify the issue once in for all
+            const message_id = Array.isArray(msg.messageID)?msg.messageID[0]:msg.messageID; 
             //generate user prompt
             const userPrompt = ai.generateUserPrompt(msg.subject,msg.date,msg.shortened_body);
             //ask ai to generate an object indicating what action to take
@@ -116,7 +118,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     if(secheduleMeetingResponse === true){
                         actionResult ={
                             action:actionObject.action,
-                            messageID:msg.messageID,
+                            messageID:message_id,
                             reason:actionObject.reason,
                             isCompleted:true,
                             actionItems:actionObject.action_items ?? []
@@ -124,7 +126,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     }else{
                          actionResult ={
                             action:actionObject.action,
-                            messageID:msg.messageID,
+                            messageID:message_id,
                             reason:actionObject.reason,
                             isCompleted:false,
                             actionItems:actionObject.action_items ?? []
@@ -153,7 +155,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     if(scheduleFollowUpResponse === true){
                         actionResult ={
                             action:actionObject.action,
-                            messageID:msg.messageID,
+                            messageID:message_id,
                             reason:actionObject.reason,
                             isCompleted:true,
                             actionItems:actionObject.action_items ?? []
@@ -161,7 +163,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     }else{
                         actionResult ={
                             action:actionObject.action,
-                            messageID:msg.messageID,
+                            messageID:message_id,
                             reason:actionObject.reason,
                             isCompleted:false,
                             actionItems:actionObject.action_items ?? []
@@ -173,7 +175,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     let replyResponse:boolean;
                     if(n8n_payload.subject_provider === 'microsoft'){
                         //set draft reply
-                        replyResponse = await email.msCreateReply(emailAccountAccessToken,msg.messageID,actionObject.reply_text);
+                        replyResponse = await email.msCreateReply(emailAccountAccessToken,message_id,actionObject.reply_text);
                     }else{
                         //Imap connection check, if okay, only then proceed forward
                         if(!subjectImapConnection){
@@ -182,7 +184,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                             //payload setup for imap draft reply saving
                             const payload:ImapCreateReplyInput = {
                                 subject_email:msg.to,                           
-                                messageID:msg.messageID,                            
+                                messageID:message_id,                            
                                 reply_receiver_email:msg.from,
                                 reply_subject:actionObject.reply_subject,
                                 reply_text:actionObject.reply_text,
@@ -196,7 +198,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     if(replyResponse === true){
                         actionResult ={
                             action:actionObject.action,
-                            messageID:msg.messageID,
+                            messageID:message_id,
                             reason:actionObject.reason,
                             isCompleted:true,
                             actionItems:actionObject.action_items ?? []
@@ -204,7 +206,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     }else{
                         actionResult ={
                             action:actionObject.action,
-                            messageID:msg.messageID,
+                            messageID:message_id,
                             reason:actionObject.reason,
                             isCompleted:false,
                             actionItems:actionObject.action_items ?? []
@@ -218,7 +220,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         //create the microsoft payload
                         const payload:MsForwardInput = {
                             token:emailAccountAccessToken,
-                            messageID:msg.messageID,
+                            messageID:message_id,
                             receiverMailArray:actionObject.forward_receiver_email,
                             forwardText:actionObject.forward_text
                         }
@@ -256,7 +258,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     if(forwardResponse === true){
                         actionResult ={
                             action:actionObject.action,
-                            messageID:msg.messageID,
+                            messageID:message_id,
                             reason:actionObject.reason,
                             isCompleted:true,
                             actionItems:actionObject.action_items ?? []
@@ -264,7 +266,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     }else{
                         actionResult ={
                             action:actionObject.action,
-                            messageID:msg.messageID,
+                            messageID:message_id,
                             reason:actionObject.reason,
                             isCompleted:false,
                             actionItems:actionObject.action_items ?? []
@@ -275,7 +277,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     //set the action result of the message
                     actionResult ={
                         action:actionObject.action,
-                        messageID:msg.messageID,
+                        messageID:message_id,
                         reason:actionObject.reason,
                         isCompleted:true,
                         actionItems:actionObject.action_items ?? []
@@ -285,7 +287,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     //set the action result of the message
                     actionResult ={
                         action:actionObject.action,
-                        messageID:msg.messageID,
+                        messageID:message_id,
                         reason:actionObject.reason,
                         isCompleted:true,
                         actionItems:actionObject.action_items ?? []
@@ -294,7 +296,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                 default:
                     actionResult = {
                         action:actionObject.action,
-                        messageID:msg.messageID,
+                        messageID:message_id,
                         reason:actionObject.reason,
                         isCompleted:true,
                         actionItems:actionObject.action_items ?? []
@@ -304,7 +306,7 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
             if(actionResult.isCompleted === true){
                 const payload:MarkAsReadInput = {
                     provider:n8n_payload.subject_provider,    
-                    messageID:msg.messageID,
+                    messageID:message_id,
                     token:emailAccountAccessToken,
                     liveImapConnection:subjectImapConnection
                 }
