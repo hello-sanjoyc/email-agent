@@ -6,6 +6,7 @@ import MailComposer from 'nodemailer/lib/mail-composer';
 import axios from 'axios';
 import { FormatAddressInput, ImapConfigWithOauth, ImapCreateReplyInput, ImapReadMessageResponse, MarkAsReadInput, MicrosoftGetMessageResponse, MsForwardInput, ReadImapMessagesInput, ReadMessageResponse, SmtpForwardInput } from './types';
 import {v4 as uuidv4} from 'uuid';
+import { logger } from '../../../config/logger';
 
 export class EmailService {
     private formatImapDate(date:Date | string):string{
@@ -183,6 +184,12 @@ export class EmailService {
 
             return draftID === verify.data.id;
         }catch(err){
+            logger.error('[EMAIL PROCESSING]',{
+                message:"error during create reply draft(microsoft)",
+                data:{messageId},
+                details:err instanceof Error?err.message:"",
+                stack: err instanceof Error?err.stack:null
+            });
             return false;
         }        
     }
@@ -217,9 +224,14 @@ export class EmailService {
             );      
             return results.length > 0;
         }catch(err){
+            logger.error('[EMAIL PROCESSING]',{
+                message:"error during create reply draft(IMAP)",
+                data:input,
+                details:err instanceof Error?err.message:"",
+                stack: err instanceof Error?err.stack:null
+            });
             return false;
         }
-       
     }
 
     /**
@@ -239,6 +251,12 @@ export class EmailService {
             }, { headers: { Authorization: `Bearer ${input.token}` } });
             return res.status === 202;
         }catch(err){
+            logger.error('[EMAIL PROCESSING]',{
+                message:"error during message forward(microsoft)",
+                data:input,
+                details:err instanceof Error?err.message:"",
+                stack: err instanceof Error?err.stack:null
+            });
             return false
         }        
     }
@@ -269,6 +287,12 @@ export class EmailService {
             });
             return true;
         }catch(err){
+            logger.error('[EMAIL PROCESSING]',{
+                message:"error during message forward(SMTP)",
+                data:input,
+                details:err instanceof Error?err.message:"",
+                stack: err instanceof Error?err.stack:null
+            });
             return false;
         }        
     }
@@ -297,6 +321,12 @@ export class EmailService {
             }
             return true;
         }catch(err){
+            logger.error('[EMAIL PROCESSING]',{
+                message:"error during marking as read",
+                data:input,
+                details:err instanceof Error?err.message:"",
+                stack: err instanceof Error?err.stack:null
+            });
             return false;
         }        
     }
