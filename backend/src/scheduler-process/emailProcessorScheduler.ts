@@ -64,7 +64,8 @@ const enqueueEmailJobsForAllUsers = async (plan:"Pro"|"Plus"|"Trial",intervalMS:
                                 imapHost:true,
                                 imapPort:true,
                                 provider:true,
-                                priorityWeight:true
+                                priorityWeight:true,
+                                createdAt:true
                             }
                         },
                         calendarAccounts:{
@@ -121,23 +122,7 @@ const enqueueEmailJobsForAllUsers = async (plan:"Pro"|"Plus"|"Trial",intervalMS:
                 if(eachUser.subscriptions[0].currentUsageCount >= eachUser.subscriptions[0].plan.quota){
                     logger.info(`[EMAIL-PROCESSING-SCHEDULING] Quota exhausted for current subscription for user with id ${eachUser.id}, skipping user...`);
                     continue;
-                }
-                const firstEverSubscription = await db.subscription.findFirst({
-                    where:{
-                        userId:eachUser.id
-                    },
-                    orderBy:{
-                        createdAt:"asc"
-                    },
-                    select:{
-                        startDate:true
-                    }
-                });
-                if(!firstEverSubscription){
-                    logger.info(`[EMAIL-PROCESSING-SCHEDULING] No subscription found of user with id ${eachUser.id}, skipping user...`);
-                    continue;
-                }
-                const firstOnboardingDate = firstEverSubscription.startDate;
+                }                                
                 //find in flight email processing jobs for the particular user
                 const userInFlightJobs = allInFlightJobs.filter((each)=>{
                     return each.data.general_data.user_id === eachUser.id;
@@ -164,7 +149,7 @@ const enqueueEmailJobsForAllUsers = async (plan:"Pro"|"Plus"|"Trial",intervalMS:
                             calendar_mail:eachUser.calendarAccounts[0].emailAddress,
                             calendar_refresh_token:eachUser.calendarAccounts[0].refreshToken ?? '',
                             calendar_provider:eachUser.calendarAccounts[0].provider, 
-                            subscription_date:firstOnboardingDate,
+                            subscription_date:eachEmailAccount.createdAt,
                             google_project_client_id:env.GOOGLE_CLIENT_ID,
                             google_project_client_secret:env.GOOGLE_CLIENT_SECRET,
                             microsoft_project_client_id:env.MICROSOFT_CLIENT_ID,

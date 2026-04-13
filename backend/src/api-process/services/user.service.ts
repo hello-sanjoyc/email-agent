@@ -681,13 +681,16 @@ export const triggerEmailProcessingManually = async (userId:string,emailAccId:st
             });
             return;
         }
+        const now = new Date();
+        const sevenDaysAgo = new Date(now);
+        sevenDaysAgo.setDate(now.getDate() - 7);
         const emailProcessingQueueData:EmailProcessingPayload = {
             n8n_payload:{
-                process_quantity:10,
+                process_quantity:15,
                 calendar_mail:userDataWithEmailAndCalendarAcc.calendarAccounts[0].emailAddress,
                 calendar_refresh_token:userDataWithEmailAndCalendarAcc.calendarAccounts[0].refreshToken ?? '',
                 calendar_provider:userDataWithEmailAndCalendarAcc.calendarAccounts[0].provider, 
-                subscription_date:new Date(),
+                subscription_date:sevenDaysAgo,
                 google_project_client_id:env.GOOGLE_CLIENT_ID,
                 google_project_client_secret:env.GOOGLE_CLIENT_SECRET,
                 microsoft_project_client_id:env.MICROSOFT_CLIENT_ID,
