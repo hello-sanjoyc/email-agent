@@ -193,16 +193,30 @@ export class EmailService {
             return false;
         }        
     }
+    private extractEmail(input: string | string[]): string {
+        // 1. Handle Array: Take the first element if it's an array
+        const raw = Array.isArray(input) ? input[0] : input;
+        
+        if (typeof raw !== 'string') return "";
+
+        // 2. Handle "Name <email@domain.com>" format
+        const match = raw.match(/<([^>]+)>/);
+        const email = match ? match[1] : raw;
+
+        return email.trim();
+    }
 
     /**
      * ACTION: REPLY DRAFT (IMAP)
      */
     async imapCreateReply(input:ImapCreateReplyInput) {
         try{
-            const draftMessageID = `<${uuidv4()}@${input.subject_email.split('@')[1]}>`
+            const cleanSenderMail = this.extractEmail(input.subject_email);
+            const cleanReceiverMail = this.extractEmail(input.reply_receiver_email);
+            const draftMessageID = `<${uuidv4()}@${cleanSenderMail.split('@')[1]}>`
             const mail = new MailComposer({
-                from: input.subject_email,
-                to: input.reply_receiver_email,
+                from: cleanSenderMail,
+                to: cleanReceiverMail,
                 subject: input.reply_subject,
                 text: input.reply_text,
                 inReplyTo: input.messageID,
@@ -283,8 +297,8 @@ export class EmailService {
             const header = `<br>---------- Forwarded message ---------<br><b>From:</b> ${input.original.from}<br><b>Date:</b> ${input.original.date}<br><b>Subject:</b> ${input.original.subject}<br><b>To:</b> ${input.original.to}<br><br>`;
 
             await transporter.sendMail({
-                from: input.forward.from,
-                to: input.forward.to,
+                from: this.extractEmail(input.forward.from),
+                to: this.extractEmail(input.forward.to),
                 subject: "Fwd: " + input.original.subject,
                 text: input.forward.text + "\n" + (input.original.forward_text || input.original.shortened_body),
                 html: input.forward.text + header + (input.original.forward_html || input.original.forward_text),
