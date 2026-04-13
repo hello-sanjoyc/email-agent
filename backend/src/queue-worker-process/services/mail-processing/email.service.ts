@@ -225,7 +225,14 @@ export class EmailService {
             return results.length > 0;
         }catch(err){
             logger.error('[EMAIL PROCESSING]',{
-                message:"error during create reply draft(IMAP)",                
+                message:"error during create reply draft(IMAP)",
+                data:{
+                    subject_email:input.subject_email,                           
+                    messageID:input.messageID,                            
+                    reply_receiver_email:input.reply_receiver_email,
+                    reply_subject:input.reply_subject,
+                    reply_text:input.reply_text,
+                },                
                 details:err instanceof Error?err.message:"",
                 stack: err instanceof Error?err.stack:null
             });
