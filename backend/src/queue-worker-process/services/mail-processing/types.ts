@@ -143,8 +143,7 @@ export type EmailAction =
     | 'no_action' 
     | 'reply' 
     | 'schedule_meeting' 
-    | 'follow_up' 
-    | 'forward' 
+    | 'follow_up'     
     | 'other';
 
 export interface EmailClassificationOutput {     

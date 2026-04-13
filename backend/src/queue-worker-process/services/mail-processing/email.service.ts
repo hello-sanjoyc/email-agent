@@ -145,7 +145,7 @@ export class EmailService {
                 to: header.to || '',
                 subject: header.subject || '',
                 date: header.date || '',
-                shortened_body: parsed.text ? parsed.text.trim() : this.cleanEmailBody(parsed.html || ''),
+                shortened_body: parsed.text ? parsed.text.trim().substring(0, 500) : this.cleanEmailBody(parsed.html || '').substring(0, 500),
                 forward_text: parsed.text || '',
                 forward_html: parsed.html || '',
                 internetMessageId:"",
