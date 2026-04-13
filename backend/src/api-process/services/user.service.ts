@@ -570,8 +570,8 @@ export const generateStats = async (userId:string,to:string,from:string):Promise
         const dateFiltration:any = {};
         //TODO: may have to change to show stats for any place's user, then we have to consider the separeate timezones too
         //right now, only utc is done        
-        if(to) dateFiltration.gte= new Date(`${to}T23:59:59.999Z`);
-        if(from) dateFiltration.lte= new Date(`${to}T00:00:00.000Z`);
+        if(to) dateFiltration.lte= new Date(`${to}T23:59:59.999Z`);
+        if(from) dateFiltration.gte= new Date(`${from}T00:00:00.000Z`);
         const emailActivityData = await db.emailActivity.groupBy({
             by:['action'],
             where:{
