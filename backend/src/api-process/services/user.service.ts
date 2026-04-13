@@ -5,6 +5,10 @@ import AppError from "../utils/appError.utils";
 import { LinkAccountResponse } from "./link-account/types";
 import { LinkCalendarAccountResponse } from "./link-calendar-account/types";
 import { EmailAccountData,FetchAIServiceDatasetEach,FetchAIToneDatasetEach,GenerateStatsResponse, UserData, UserDataByEmail, UserProfileData } from "./types";
+import { EmailProcessingPayload } from "../../types/types";
+import env from "../../config/env";
+import { emailProcessingQueue } from "../../queues/emailProcessingQueue";
+import { logger } from "../../config/logger";
 
 export const getAccounts = async (userId:string)=> {
     try{
@@ -20,7 +24,7 @@ export const getAccounts = async (userId:string)=> {
                 deletedAt:true
             }
         });
-        if(accounts.length === 0) throw new AppError('no profiles found',404);
+        if(accounts.length === 0) throw new AppError('no accounts found',404);
         const accountData = accounts.map(function(account){
             return {
                 id:account.id,
@@ -37,13 +41,33 @@ export const getAccounts = async (userId:string)=> {
         throw err;
     }
 }
-export const createEmailAccount = async (providerResponse:LinkAccountResponse,userId:string):Promise<boolean> => {
+//to check if any email account exist for the user or not(active or inactive, any)
+export const doesAnyEmailAccExist = async (userId:string):Promise<boolean> => {
+    try{
+        const accounts =await db.emailAccount.findMany({
+            where:{userId},
+            select:{
+                id:true,
+                emailAddress:true,
+                isActive:true,
+                provider:true,
+                priorityWeight:true,
+                createdAt:true,
+                deletedAt:true
+            }
+        });
+        return accounts.length === 0?false:true;
+    }catch(err){
+        throw err;
+    }
+}
+export const createEmailAccount = async (providerResponse:LinkAccountResponse,userId:string):Promise<string> => {
     try{
         return await db.$transaction(async(tx)=>{
             const existingEmailAccounts =await tx.emailAccount.findMany({where:{userId}});
             const isAccountWithSameMail = existingEmailAccounts.some((each)=>each.emailAddress === providerResponse.email);
             if(isAccountWithSameMail) throw new AppError('Email account already exists',409);
-            await tx.emailAccount.create({
+            const emailAccountData = await tx.emailAccount.create({
                 data:{
                     emailAddress:providerResponse.email,
                     accessToken:providerResponse.accessToken,
@@ -59,7 +83,7 @@ export const createEmailAccount = async (providerResponse:LinkAccountResponse,us
                     priorityWeight:existingEmailAccounts.length === 0?100:0
                 }            
             });
-            return true;
+            return emailAccountData.id;
         });        
     }catch(err){
         throw err;
@@ -571,14 +595,25 @@ export const generateStats = async (userId:string,to:string,from:string):Promise
     }
 }
 
-//get data for manual trigger
-export const getDataForManualTrigger = async (userId:string,emailAccId:string) => {
+//get data for manual trigger(for internal call in this user service. when new email account is created)
+export const triggerEmailProcessingManually = async (userId:string,emailAccId:string):Promise<void> => {
     try{
+        const allInFlightJobs = await emailProcessingQueue.getJobs(['waiting','active']);
+        const isActiveJobPresent = allInFlightJobs.some((each)=>{
+            return (each.data.general_data.user_id === userId && each.data.general_data.email_account_id === emailAccId)
+        });
+        if(isActiveJobPresent){
+            logger.warn(`first email processing trigger failed`,{
+                userId,
+                emailAccId,
+                message: "a job is already in queue"                
+            });
+            return;
+        }
         const userDataWithEmailAndCalendarAcc = await db.user.findFirst(
             {
                 where:{
-                    id:userId,
-                    isAutomationActive:true,
+                    id:userId,                   
                     isActive:true,                 
                 },
                 select:{
@@ -621,11 +656,74 @@ export const getDataForManualTrigger = async (userId:string,emailAccId:string) =
                 }
             },
         );
-        if(!userDataWithEmailAndCalendarAcc) throw new AppError('No valid user found',404);
-        if(userDataWithEmailAndCalendarAcc.emailAccounts.length === 0) throw new AppError('Email Account not found',404);
-        if(userDataWithEmailAndCalendarAcc.calendarAccounts.length === 0) throw new AppError('Calendar Account not found',404);
-
+        if(!userDataWithEmailAndCalendarAcc){
+            logger.warn(`first email processing trigger failed`,{
+                userId,
+                emailAccId,
+                message: "user not found"                
+            });
+            return;
+        }
+        if(userDataWithEmailAndCalendarAcc.emailAccounts.length === 0){
+            logger.warn(`first email processing trigger failed`,{
+                userId,
+                emailAccId,
+                message: "email account not found"                
+            });
+            return;
+        }
+        if(userDataWithEmailAndCalendarAcc.calendarAccounts.length === 0){
+            logger.warn(`first email processing trigger failed`,{
+                userId,
+                emailAccId,
+                message: "calendar account not found"                
+            });
+            return;
+        }
+        const emailProcessingQueueData:EmailProcessingPayload = {
+            n8n_payload:{
+                process_quantity:10,
+                calendar_mail:userDataWithEmailAndCalendarAcc.calendarAccounts[0].emailAddress,
+                calendar_refresh_token:userDataWithEmailAndCalendarAcc.calendarAccounts[0].refreshToken ?? '',
+                calendar_provider:userDataWithEmailAndCalendarAcc.calendarAccounts[0].provider, 
+                subscription_date:new Date(),
+                google_project_client_id:env.GOOGLE_CLIENT_ID,
+                google_project_client_secret:env.GOOGLE_CLIENT_SECRET,
+                microsoft_project_client_id:env.MICROSOFT_CLIENT_ID,
+                microsoft_project_client_secret:env.MICROSOFT_CLIENT_SECRET,
+                microsoft_project_object_id:env.MICROSOFT_OBJECT_ID,             
+                subject_email:userDataWithEmailAndCalendarAcc.emailAccounts[0].emailAddress,
+                subject_provider:userDataWithEmailAndCalendarAcc.emailAccounts[0].provider,
+                subject_password:userDataWithEmailAndCalendarAcc.emailAccounts[0].appPassword ?? '',
+                subject_refresh_token:userDataWithEmailAndCalendarAcc.emailAccounts[0].refreshToken ?? '',
+                subject_imap_url:userDataWithEmailAndCalendarAcc.emailAccounts[0].imapHost ?? '',
+                subject_imap_port:userDataWithEmailAndCalendarAcc.emailAccounts[0].imapPort ?? 0,
+                subject_smtp_url:userDataWithEmailAndCalendarAcc.emailAccounts[0].smtpHost ?? '',
+                subject_smtp_port:userDataWithEmailAndCalendarAcc.emailAccounts[0].smtpPort ?? 0  
+            },
+            general_data:{
+                user_id:userDataWithEmailAndCalendarAcc.id,
+                ai_response_tone:userDataWithEmailAndCalendarAcc.aiResponseTone,
+                ai_service_name:userDataWithEmailAndCalendarAcc.aiServiceName,
+                plan_id:null,
+                subscription_id:null,
+                email_account_id:userDataWithEmailAndCalendarAcc.emailAccounts[0].id,
+                calendar_account_id:userDataWithEmailAndCalendarAcc.calendarAccounts[0].id
+            }                                                
+        }
+        await emailProcessingQueue.add('email-processing',emailProcessingQueueData,{
+            jobId:`${userId}-${emailAccId}`
+        });
+        await db.emailAccount.update({
+            where:{id:emailAccId},
+            data:{isManuallyTriggered:true}
+        });
+        return;
     }catch(err){
-
+        logger.warn(`first email processing trigger failed`,{
+            message: err instanceof Error?err.message:"unknown error",
+            stack: err instanceof Error?err.stack:null
+        });
+        return;
     }
 }

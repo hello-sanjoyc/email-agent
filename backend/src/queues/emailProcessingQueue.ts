@@ -1,5 +1,5 @@
 import { Queue } from "bullmq";
-import { EmailProcessingPayload } from "./types";
+import { EmailProcessingPayload } from "../types/types";
 import { logger } from "../config/logger";
 import {redisConnection} from "../config/redis";
 export let emailProcessingQueue:Queue<EmailProcessingPayload>;

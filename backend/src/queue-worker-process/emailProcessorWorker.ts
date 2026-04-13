@@ -1,5 +1,6 @@
 import { Worker, Job } from "bullmq";
-import { EmailActivityCreationDataset, EmailProcessingPayload } from "./types";
+import { EmailActivityCreationDataset } from "./types";
+import { EmailProcessingPayload } from "../types/types";
 import { logger } from "../config/logger";
 import {redisConnection} from "../config/redis";
 import db from "../db";
@@ -65,18 +66,21 @@ const processEmailJobs = async (job:Job<EmailProcessingPayload>):Promise<void> =
                     await tx.actionItem.createMany({
                         data: actionItemsToInsert,
                     });
-                }                
-                //update count for those actions which are performed successfully(completed)
-                await tx.subscription.update({
-                    where:{
-                        id:job.data.general_data.subscription_id
-                    },
-                    data:{
-                        currentUsageCount:{
-                            increment:completedActionCount
+                }
+                if(job.data.general_data.subscription_id && job.data.general_data.plan_id){
+                    //update count for those actions which are performed successfully(completed)
+                    await tx.subscription.update({
+                        where:{
+                            id:job.data.general_data.subscription_id
+                        },
+                        data:{
+                            currentUsageCount:{
+                                increment:completedActionCount
+                            }
                         }
-                    }
-                });
+                    });
+                }                
+                
                 await tx.user.update({
                     where:{id:job.data.general_data.user_id},
                     data:{

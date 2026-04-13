@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getProfile, getUserAccounts, linkAccount,getUserCalendarAccounts,linkCalendarAccount, toggleAccountStatus, toggleCalendarAccountStatus,getServiceStats,updateProfile, getAIResponseTones, changeAIResponseTone, toggleAutomationStatus, updateEmailAccountsPriority, deleteEmailAccount, deleteCalendarAccount, getAIServices, changeAIService, triggerEmailActivity } from '../../controllers/v1/user.controller.js';
+import { getProfile, getUserAccounts, linkAccount,getUserCalendarAccounts,linkCalendarAccount, toggleAccountStatus, toggleCalendarAccountStatus,getServiceStats,updateProfile, getAIResponseTones, changeAIResponseTone, toggleAutomationStatus, updateEmailAccountsPriority, deleteEmailAccount, deleteCalendarAccount, getAIServices, changeAIService } from '../../controllers/v1/user.controller.js';
 import { authenticate } from '../../middlewares/authentication.js';
 import { getServiceStatsValidationRules, updateEmailAccountsPriorityValidationRules } from '../../validators/user.validator.js';
 import { checkRouteValidity } from '../../middlewares/validationMiddleware.js';
@@ -42,6 +42,4 @@ userRouter.delete('/calendar-account/:id',authenticate,deleteCalendarAccount);
 userRouter.get('/ai-services',authenticate,getAIServices);
 //change AI response tone
 userRouter.put('/ai-service',authenticate,changeAIService);
-//manual trigger first ever email activity(will not consider plan for this)
-userRouter.post('/trigger-email-activity/:id',authenticate,triggerEmailActivity);
 export default userRouter;

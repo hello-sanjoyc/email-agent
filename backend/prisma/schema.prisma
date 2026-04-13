@@ -170,8 +170,8 @@ model EmailActivity {
   userId String @db.Uuid @map("user_id")
   calendarAccountId String @db.Uuid @map("calendar_account_id")
   emailAccountId String @db.Uuid @map("email_account_id")
-  planId String @db.Uuid @map("plan_id")
-  subscriptionId String @db.Uuid @map("subscription_id")
+  planId String? @db.Uuid @map("plan_id")
+  subscriptionId String? @db.Uuid @map("subscription_id")
   messageId String @db.Text @map("message_id")
   action String @db.Text @map("action")
   reason String? @db.Text @map("reason")
@@ -179,8 +179,8 @@ model EmailActivity {
   processedAt DateTime @default(now()) @map("processed_at")
   user User @relation(fields: [userId], references: [id])
   emailAccount EmailAccount @relation(fields: [emailAccountId],references: [id])
-  plan SubscriptionPlan @relation(fields: [planId], references: [id])
-  subscription Subscription @relation(fields: [subscriptionId], references: [id])
+  plan SubscriptionPlan? @relation(fields: [planId], references: [id])
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
   actionItems ActionItem[] 
   @@map("email_activities")
 }

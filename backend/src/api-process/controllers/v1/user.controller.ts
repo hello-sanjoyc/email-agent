@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../../utils/appError.utils";
-import { changeProfileAIResponseTone, changeProfileAIService, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, fetchAiResponseToneByID, fetchAiServiceByID, fetchAIServicesDataset, fetchAIToneDataset, fetchEmailAccount, fetchUserData, generateStats, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
+import { changeProfileAIResponseTone, changeProfileAIService, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, doesAnyEmailAccExist, fetchAiResponseToneByID, fetchAiServiceByID, fetchAIServicesDataset, fetchAIToneDataset, fetchEmailAccount, fetchUserData, generateStats, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, triggerEmailProcessingManually, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
 import { ChangeAIResponseToneInput, ChangeAIServiceInput, LinkAccountInput,LinkCalendarAccountInput, ToggleAutomationStatus, UpdateEmailAccountsPriorityInput, UpdateProfileInput } from "./types";
 import { LinkAccountFactory } from "../../services/link-account/factory";
 import { LinkCalendarAccountFactory } from "../../services/link-calendar-account/factory";
@@ -25,12 +25,17 @@ export const getUserAccounts = async (req:Request,res:Response,next:NextFunction
 export const linkAccount = async (req:Request,res:Response,next:NextFunction)=>{
     try{
        const userId = req.user?.id;
-       if(!userId) throw new AppError('invalid user',400); 
+       if(!userId) throw new AppError('invalid user',400);
+       //TODO: this next two lines is specifically added for the case when only single email account is allowed for a user
+       //should remove it when not necessary in future.
+       const isAnyEmailAccPresent = await doesAnyEmailAccExist(userId);
+       if(isAnyEmailAccPresent) throw new AppError('Email account already exists for the user',409); 
        const input = req.body as LinkAccountInput;      
        const providerName = input.provider.toLowerCase();
        const provider =  LinkAccountFactory.getProvider(providerName);
        const providerResponse = await provider.link(input);
-       await createEmailAccount(providerResponse,userId);
+       const emailAccId = await createEmailAccount(providerResponse,userId);
+       await triggerEmailProcessingManually(userId,emailAccId);
        return res.status(200).json({
         error:false,
         message:"Email account created for the user"
@@ -291,16 +296,4 @@ export const changeAIService = async (req:Request,res:Response,next:NextFunction
     }catch(err){
         next(err);
     }
-}
-//function to trigger manual email activity (will not consider plan)
-export const triggerEmailActivity = async (req:Request,res:Response,next:NextFunction) => {
-    // try{
-    //     const emailAccId = req.params.id as string;
-    //     const userId = req.user?.id;
-    //     if(!userId) throw new AppError('Invalid user',400);
-    //     if(!emailAccId) throw new AppError('Invalid email account',400);
-    //     const data = await getDataForManualTrigger(userId,emailAccId); 
-    // }catch(err){
-    //     next(err);
-    // }
 }

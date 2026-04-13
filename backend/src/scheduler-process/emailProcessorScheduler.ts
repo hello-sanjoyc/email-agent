@@ -1,7 +1,7 @@
 import cron, { ScheduledTask } from "node-cron";
 import db from "../db";
 import { logger } from "../config/logger";
-import { EmailProcessingPayload } from "./types";
+import { EmailProcessingPayload } from "../types/types";
 import env from "../config/env";
 import { getEmailProcessingQueue } from "../queues/emailProcessingQueue";
 let scheduledPlusTask:ScheduledTask|null = null;

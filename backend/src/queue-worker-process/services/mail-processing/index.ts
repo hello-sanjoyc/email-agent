@@ -1,7 +1,7 @@
 import { AuthService } from "./auth.service";
 import { CalendarService } from "./calendar.service";
 import { EmailService } from "./email.service";
-import { EmailProcessingPayload } from "../../types";
+import { EmailProcessingPayload } from "../../../types/types";
 import { ActionResultBagItem, CreateEventInput , ImapCreateReplyInput, MarkAsReadInput, MsForwardInput, ProcessEmailResponse, Provider, ReadMessageResponse, SmtpForwardInput } from "./types";
 import * as imaps from 'imap-simple';
 import { AIServiceFactory } from "./ai/ai.factory";
