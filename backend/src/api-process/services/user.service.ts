@@ -7,7 +7,7 @@ import { LinkCalendarAccountResponse } from "./link-calendar-account/types";
 import { EmailAccountData,FetchAIServiceDatasetEach,FetchAIToneDatasetEach,GenerateStatsResponse, UserData, UserDataByEmail, UserProfileData } from "./types";
 import { EmailProcessingPayload } from "../../types/types";
 import env from "../../config/env";
-import { emailProcessingQueue, getEmailProcessingQueue } from "../../queues/emailProcessingQueue";
+import { getEmailProcessingQueue } from "../../queues/emailProcessingQueue";
 import { logger } from "../../config/logger";
 
 export const getAccounts = async (userId:string)=> {

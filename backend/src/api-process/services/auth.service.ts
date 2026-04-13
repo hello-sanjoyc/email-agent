@@ -42,7 +42,8 @@ export const createUser = async (name:string,email:string,phone:string|undefined
           name,
           email,
           password:hashedPassword,
-          phone:phone ?? null        
+          phone:phone ?? null,
+          aiServiceName: "groq" // I am setting default service name as groq due to its rate limiting facility in testing mode, can change it later        
         },
         select:{
           id:true,
