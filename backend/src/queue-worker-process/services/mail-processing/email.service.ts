@@ -225,8 +225,7 @@ export class EmailService {
             return results.length > 0;
         }catch(err){
             logger.error('[EMAIL PROCESSING]',{
-                message:"error during create reply draft(IMAP)",
-                data:input,
+                message:"error during create reply draft(IMAP)",                
                 details:err instanceof Error?err.message:"",
                 stack: err instanceof Error?err.stack:null
             });
@@ -252,8 +251,7 @@ export class EmailService {
             return res.status === 202;
         }catch(err){
             logger.error('[EMAIL PROCESSING]',{
-                message:"error during message forward(microsoft)",
-                data:input,
+                message:"error during message forward(microsoft)",               
                 details:err instanceof Error?err.message:"",
                 stack: err instanceof Error?err.stack:null
             });
@@ -288,8 +286,7 @@ export class EmailService {
             return true;
         }catch(err){
             logger.error('[EMAIL PROCESSING]',{
-                message:"error during message forward(SMTP)",
-                data:input,
+                message:"error during message forward(SMTP)",                
                 details:err instanceof Error?err.message:"",
                 stack: err instanceof Error?err.stack:null
             });
@@ -322,8 +319,7 @@ export class EmailService {
             return true;
         }catch(err){
             logger.error('[EMAIL PROCESSING]',{
-                message:"error during marking as read",
-                data:input,
+                message:"error during marking as read",                
                 details:err instanceof Error?err.message:"",
                 stack: err instanceof Error?err.stack:null
             });
