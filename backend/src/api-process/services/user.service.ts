@@ -737,10 +737,18 @@ export const fetchActionItems = async (to:string,from:string,type:string,userId:
        let actionItemsFilter:any = {};
        if(type === '0'){
             actionItemsFilter.deadline = {not:null};
-       }else if(type === '1'){
-            if(to) actionItemsFilter.createdAt.lte= new Date(`${to}T23:59:59.999Z`);
-            if(from) actionItemsFilter.createdAt.gte= new Date(`${from}T00:00:00.000Z`);
+       }else if(type === '1'){            
             actionItemsFilter.deadline = null;
+            if (to || from) {
+                actionItemsFilter.createdAt = {};
+                
+                if (to) {
+                    actionItemsFilter.createdAt.lte = new Date(`${to}T23:59:59.999Z`);
+                }
+                if (from) {
+                    actionItemsFilter.createdAt.gte = new Date(`${from}T00:00:00.000Z`);
+                }
+            }
        }       
        const data = await db.user.findFirst({
         where:{id:userId},
