@@ -1,6 +1,7 @@
 import { google } from 'googleapis';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { CreateEventInput } from './types';
+import { logger } from '../../../config/logger';
 
 export class CalendarService {
     async createGoogleEvent(input:CreateEventInput) {
@@ -24,6 +25,11 @@ export class CalendarService {
             });
             return true;
         }catch(err){
+            logger.error('[EMAIL PROCESSING]',{
+                message:"error during create calendar event(google)",
+                details:err instanceof Error?err.message:"",
+                stack: err instanceof Error?err.stack:null
+            });
             return false;
         }
         
@@ -53,6 +59,11 @@ export class CalendarService {
 
             return await client.api('/me/events').post(event);
         }catch(err){
+            logger.error('[EMAIL PROCESSING]',{
+                message:"error during create calendar event(microsoft)",
+                details:err instanceof Error?err.message:"",
+                stack: err instanceof Error?err.stack:null
+            });
             return false;
         }        
     }
