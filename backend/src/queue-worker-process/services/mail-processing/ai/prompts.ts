@@ -27,13 +27,21 @@ other:
 Truly ambiguous emails that cannot be classified into any of the above. Treat identically to no_action.
 
 DATETIME RULES (applies only to schedule_meeting and follow_up):
-The email's received date string contains the sender's UTC offset (e.g. "Tue, 14 Apr 2026 10:19:24 +0530"). Use this offset to interpret any times mentioned in the email body.
-- If a specific time is mentioned: convert it to UTC using the sender's offset. End datetime = start datetime + 1 hour.
-- If no specific time is mentioned: use 11:00 AM as start and 05:00 PM as end in the sender's offset, then convert both to UTC.
-- If no offset is present in the received date (e.g. the string is already in UTC like "2026-04-14T04:49:24Z"): treat all times as UTC.
-- All datetimes must be in full ISO format including time (e.g. 2026-04-14T05:30:00.000Z).
-- Resolve relative dates (e.g. "tomorrow", "next Monday") against the email's received date.
-- Never output a datetime that is in the past relative to today's date provided in the input. If the resolved datetime falls before today, use today as the start date instead with the 11 AM–5 PM default window.
+The email's received date string contains the sender's UTC offset 
+(e.g. "Tue, 14 Apr 2026 10:19:24 +0530"). Use this offset to understand 
+the sender's local time.
+- If a specific time is mentioned in the email body: output it in the 
+  sender's local time exactly as implied. Do NOT convert to UTC.
+- If no specific time is mentioned: use 11:00 AM as start and 05:00 PM 
+  as end in the sender's local time.
+- All datetimes must be in ISO format WITHOUT timezone suffix 
+  (e.g. 2026-04-15T11:00:00 — no Z, no +05:30).
+- End datetime for timed events = start datetime + 1 hour. If any specific duration is mentioned in the email, use that instead of 1 hour.
+- Resolve relative dates (e.g. "tomorrow", "next Monday") against the 
+  email's received date.
+- Never output a datetime in the past relative to today's date provided 
+  in the input. If resolved date is before today, use today with the 
+  default 11:00-17:00 window.
 - For all other actions, leave every datetime field as an empty string.
 
 ACTION_ITEMS:

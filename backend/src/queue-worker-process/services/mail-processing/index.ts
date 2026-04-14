@@ -104,7 +104,8 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         title:actionObject.meeting_title,
                         description:actionObject.meeting_description,
                         startDateTime:actionObject.meeting_start_datetime,
-                        endDateTime:actionObject.meeting_end_datetime    
+                        endDateTime:actionObject.meeting_end_datetime,
+                        senderUtcOffset:msg.senderUtcOffset    
                     }
                     //response variable
                     let secheduleMeetingResponse:boolean;
@@ -141,7 +142,8 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         title:actionObject.follow_up_title,
                         description:actionObject.follow_up_description,
                         startDateTime:actionObject.follow_up_start_datetime,
-                        endDateTime:actionObject.follow_up_end_datetime    
+                        endDateTime:actionObject.follow_up_end_datetime,
+                        senderUtcOffset:msg.senderUtcOffset    
                     }
                     //set response variable
                     let scheduleFollowUpResponse:boolean;

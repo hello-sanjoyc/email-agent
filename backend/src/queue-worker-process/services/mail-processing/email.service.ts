@@ -55,7 +55,19 @@ export class EmailService {
         }
         return null;
     }
-
+    private extractUtcOffset(dateStr: string): string {
+        if (!dateStr || typeof dateStr !== 'string') return '+0000';
+        
+        // Match numeric offset: +0530, -0500, +0000
+        const numericMatch = dateStr.match(/([+-]\d{4})\s*$/);
+        if (numericMatch) return numericMatch[1];
+        
+        // Match named UTC equivalents
+        if (/\b(UTC|GMT|UT)\b/i.test(dateStr)) return '+0000';
+        
+        //fallback
+        return '+0000';
+    }
     /**
      * INBOX READING: MICROSOFT (GRAPH API)
      */
@@ -92,6 +104,7 @@ export class EmailService {
                 forward_html: msg.body.content,
                 forward_text: plainText,
                 internetMessageId:msg.internetMessageId,
+                senderUtcOffset: this.extractUtcOffset(originalDate),
                 attachments: [] // Graph attachments require a separate call
             };   
         });
@@ -159,6 +172,7 @@ export class EmailService {
                 forward_text: parsed.text || '',
                 forward_html: parsed.html || '',
                 internetMessageId:"",
+                senderUtcOffset: this.extractUtcOffset(this.getHeaderString(header.date)),
                 attachments: (parsed.attachments || []).map(att => ({
                     filename: att.filename,
                     content: att.content,

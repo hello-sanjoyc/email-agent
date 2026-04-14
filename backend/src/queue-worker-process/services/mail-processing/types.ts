@@ -100,6 +100,7 @@ export interface CreateEventInput {
     startDateTime:string;
     endDateTime:string;
     description:string;
+    senderUtcOffset: string;
 }
 export interface ReadMessageResponse{
     messageID:string;
@@ -112,6 +113,7 @@ export interface ReadMessageResponse{
     forward_text:string;
     internetMessageId:string;
     attachments: any;
+    senderUtcOffset: string;
 }
 export interface ImapReadMessageResponse {
     readMessageResponse:ReadMessageResponse[],
