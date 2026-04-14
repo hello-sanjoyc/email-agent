@@ -59,11 +59,13 @@ export class EmailService {
     /**
      * INBOX READING: MICROSOFT (GRAPH API)
      */
-    async readMicrosoftMessages(token: string,readCount:number):Promise<ReadMessageResponse[]> {
+    async readMicrosoftMessages(token: string,readCount:number,sinceDate: Date | string):Promise<ReadMessageResponse[]> {
+        const d = sinceDate instanceof Date ? sinceDate : new Date(sinceDate);
+        const sinceDateISO = d.toISOString();
         const response = await axios.get<MicrosoftGetMessageResponse>('https://graph.microsoft.com/v1.0/me/messages', {
             headers: { Authorization: `Bearer ${token}` },
             params: {
-                '$filter': 'isRead eq false',
+                '$filter': `isRead eq false and receivedDateTime ge ${sinceDateISO}`,
                 '$top': readCount, // Matching your messages.slice(0, 5)
                 '$select': 'id,subject,from,sender,toRecipients,receivedDateTime,body,bodyPreview,internetMessageHeaders'
             }

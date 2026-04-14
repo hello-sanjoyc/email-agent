@@ -66,11 +66,11 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
         //read the inbox
         let messages:ReadMessageResponse[];
         if(n8n_payload.subject_provider === 'microsoft'){
-            messages = await email.readMicrosoftMessages(emailAccountAccessToken,n8n_payload.process_quantity);
+            messages = await email.readMicrosoftMessages(emailAccountAccessToken,n8n_payload.process_quantity,n8n_payload.subscription_date);
         }else{
             //create the payload
             const payload = {
-                 subject_email:n8n_payload.subject_email,
+                subject_email:n8n_payload.subject_email,
                 subject_password:n8n_payload.subject_password,
                 authString:googlexoauth,
                 subject_imap_url:n8n_payload.subject_imap_url,
