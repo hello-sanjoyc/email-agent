@@ -19,6 +19,13 @@ export const isEmailUsed = async (email:string):Promise<boolean> => {
   try{          
     const recordByEmail = await db.user.findFirst({where:{email}});       
     if(recordByEmail){
+      if(recordByEmail.isActive === false){
+        await db.user.update({
+          where:{id:recordByEmail.id},
+          data:{isActive:true}
+        });
+        throw new AppError("Your deactivated account activated successfully. Please try to login now",400);
+      }
       logger.warn('email already used',{email});
       return true;
     }   

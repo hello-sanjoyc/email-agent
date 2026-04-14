@@ -4,7 +4,7 @@ import { AIResponseTone, Prisma } from "../../generated/prisma";
 import AppError from "../utils/appError.utils";
 import { LinkAccountResponse } from "./link-account/types";
 import { LinkCalendarAccountResponse } from "./link-calendar-account/types";
-import { EmailAccountData,FetchAIServiceDatasetEach,FetchAIToneDatasetEach,GenerateStatsResponse, UserData, UserDataByEmail, UserProfileData } from "./types";
+import { EmailAccountData,FetchActionItemsDataFormat,FetchAIServiceDatasetEach,FetchAIToneDatasetEach,GenerateStatsResponse, UserData, UserDataByEmail, UserProfileData } from "./types";
 import { EmailProcessingPayload } from "../../types/types";
 import env from "../../config/env";
 import { getEmailProcessingQueue } from "../../queues/emailProcessingQueue";
@@ -729,5 +729,100 @@ export const triggerEmailProcessingManually = async (userId:string,emailAccId:st
             stack: err instanceof Error?err.stack:null
         });
         return;
+    }
+}
+//get action items for a user is a proper format
+export const fetchActionItems = async (to:string,from:string,type:string,userId:string):Promise<FetchActionItemsDataFormat[]> => {
+    try{
+       let actionItemsFilter:any = {};
+       if(type === '0'){
+            actionItemsFilter.deadline = {not:null};
+       }else if(type === '1'){
+            if(to) actionItemsFilter.createdAt.lte= new Date(`${to}T23:59:59.999Z`);
+            if(from) actionItemsFilter.createdAt.gte= new Date(`${from}T00:00:00.000Z`);
+            actionItemsFilter.deadline = null;
+       }       
+       const data = await db.user.findFirst({
+        where:{id:userId},
+        select:{
+            id:true,
+            name:true,
+            email:true,
+            emailActivities:{
+                select:{
+                    actionItems:{
+                        where:actionItemsFilter,
+                        select:{
+                            id:true,
+                            emailActivityId:true,
+                            summary:true,
+                            deadline:true,
+                            createdAt:true,
+                            isSeen:true,
+                            priority:true
+                        }
+                    }
+                }
+            }
+        }
+       });
+       if(!data) throw new AppError('User not found',404);
+       if(data.emailActivities.length === 0) throw new AppError('No email accounts found',404);
+       const finalData = data.emailActivities.flatMap((eachEmailActivity) => {         
+          const actionItemDataArray = eachEmailActivity.actionItems.map((eachActionItem) => {
+                return {
+                    label:eachActionItem.summary,
+                    priority:eachActionItem.priority,
+                    deadline:eachActionItem.deadline,
+                    dateCreated:eachActionItem.createdAt,
+                    isSeen:eachActionItem.isSeen,
+                    id:eachActionItem.id
+                }
+          });
+          return actionItemDataArray;
+       });
+       return finalData;
+    }catch(err){
+        throw err;
+    }
+}
+//find action item by id 
+export const findActionItemById = async (id:string):Promise<{id:string,isSeen:boolean}> => {
+    try{
+        const data = await db.actionItem.findUnique({
+            where:{id},
+            select:{
+                id:true,
+                isSeen:true
+            }
+        });
+        if(!data) throw new AppError('Action item not found',404);
+        return data;
+    }catch(err){
+        throw err;
+    }
+}
+//toggle is seen of action item
+export const changeIsSeenOfActionItem = async (id:string,currentIsSeen:boolean) => {
+    try{
+        await db.actionItem.update({
+            where:{id},
+            data:{isSeen:!currentIsSeen}
+        });
+        return true;
+    }catch(err){
+        throw err;
+    }
+}
+//deactivate the user
+export const deactivateUser = async (id:string):Promise<boolean> => {
+    try{
+        await db.user.update({
+            where:{id},
+            data:{isActive:false}
+        });
+        return true;
+    }catch(err){
+        throw err;
     }
 }

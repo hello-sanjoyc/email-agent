@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../../utils/appError.utils";
-import { changeProfileAIResponseTone, changeProfileAIService, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, doesAnyEmailAccExist, fetchAiResponseToneByID, fetchAiServiceByID, fetchAIServicesDataset, fetchAIToneDataset, fetchEmailAccount, fetchUserData, generateStats, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, triggerEmailProcessingManually, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
+import { changeIsSeenOfActionItem, changeProfileAIResponseTone, changeProfileAIService, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, deactivateUser, doesAnyEmailAccExist, fetchActionItems, fetchAiResponseToneByID, fetchAiServiceByID, fetchAIServicesDataset, fetchAIToneDataset, fetchEmailAccount, fetchUserData, findActionItemById, generateStats, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, triggerEmailProcessingManually, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
 import { ChangeAIResponseToneInput, ChangeAIServiceInput, LinkAccountInput,LinkCalendarAccountInput, ToggleAutomationStatus, UpdateEmailAccountsPriorityInput, UpdateProfileInput } from "./types";
 import { LinkAccountFactory } from "../../services/link-account/factory";
 import { LinkCalendarAccountFactory } from "../../services/link-calendar-account/factory";
@@ -292,6 +292,54 @@ export const changeAIService = async (req:Request,res:Response,next:NextFunction
             error:false,
             message:`AI response tone is set to ${serviceData.name}`,
             data:null
+        });
+    }catch(err){
+        next(err);
+    }
+}
+//get action items for a certain user
+export const getActionItems = async (req:Request,res:Response,next:NextFunction) => {
+    try{
+        const {to,from,type} = req.query;
+        const userId = req.user?.id;
+        if(!userId) throw new AppError("Invalid user",400);
+        const data = await fetchActionItems(to as string,from as string, type as string,userId);
+        return res.status(200).json({
+            error:false,
+            message:"Action items fetched",
+            data
+        });
+    }catch(err){
+        next(err);
+    }
+}
+//toggle is seen of action item
+export const toggleIsSeenOfActionItem = async (req:Request, res:Response,next:NextFunction) => {
+    try{
+        const userId = req.user?.id;
+        if(!userId) throw new AppError("Invalid user",400);
+        const actionItemId = req.params.id as string;
+        if(!actionItemId) throw new AppError("Invalid action item",400);
+        const actionItemData = await findActionItemById(actionItemId);
+        await changeIsSeenOfActionItem(actionItemId,actionItemData.isSeen);
+        const newIsSeen = !actionItemData.isSeen;
+        return res.status(200).json({
+            error:false,
+            message:newIsSeen?"Action item seen":"Action item unseen"
+        });
+    }catch(err){
+        next(err);
+    }
+}
+//deactivate user Profile
+export const deactivateProfile = async (req:Request,res:Response,next:NextFunction) => {
+    try{
+        const userId = req.user?.id;
+        if(!userId) throw new AppError('Invalid user',400);
+        await deactivateUser(userId);
+        return res.status(200).json({
+            error:false,
+            message:"Profile deactivated successfully"
         });
     }catch(err){
         next(err);

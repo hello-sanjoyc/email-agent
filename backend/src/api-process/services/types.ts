@@ -1,5 +1,5 @@
 import { Decimal } from "@prisma/client/runtime/client";
-import { AIResponseTone, BillingInterval } from "../../generated/prisma";
+import { ActionItemPriority, AIResponseTone, BillingInterval } from "../../generated/prisma";
 
 export interface NewCreatedUserWithAccount {
     id:string;
@@ -148,4 +148,12 @@ export interface GenerateStatsResponse {
     label:string;
     iconKey:string;
     value:number;
+}
+export interface FetchActionItemsDataFormat {
+    label: string;
+    priority: ActionItemPriority
+    deadline: Date | null;
+    dateCreated: Date;
+    isSeen: boolean;
+    id:string;
 }

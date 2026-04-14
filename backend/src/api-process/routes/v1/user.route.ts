@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getProfile, getUserAccounts, linkAccount,getUserCalendarAccounts,linkCalendarAccount, toggleAccountStatus, toggleCalendarAccountStatus,getServiceStats,updateProfile, getAIResponseTones, changeAIResponseTone, toggleAutomationStatus, updateEmailAccountsPriority, deleteEmailAccount, deleteCalendarAccount, getAIServices, changeAIService } from '../../controllers/v1/user.controller.js';
+import { getProfile, getUserAccounts, linkAccount,getUserCalendarAccounts,linkCalendarAccount, toggleAccountStatus, toggleCalendarAccountStatus,getServiceStats,updateProfile, getAIResponseTones, changeAIResponseTone, toggleAutomationStatus, updateEmailAccountsPriority, deleteEmailAccount, deleteCalendarAccount, getAIServices, changeAIService, getActionItems, toggleIsSeenOfActionItem, deactivateProfile } from '../../controllers/v1/user.controller.js';
 import { authenticate } from '../../middlewares/authentication.js';
 import { getServiceStatsValidationRules, updateEmailAccountsPriorityValidationRules } from '../../validators/user.validator.js';
 import { checkRouteValidity } from '../../middlewares/validationMiddleware.js';
@@ -42,4 +42,10 @@ userRouter.delete('/calendar-account/:id',authenticate,deleteCalendarAccount);
 userRouter.get('/ai-services',authenticate,getAIServices);
 //change AI response tone
 userRouter.put('/ai-service',authenticate,changeAIService);
+//get action items
+userRouter.get('/action-items',authenticate,getActionItems);
+//toggle is seen of a specific action item
+userRouter.put('/action-item/seen/toggle/:id',authenticate,toggleIsSeenOfActionItem);
+//deactivate profile
+userRouter.post('/profile/deactivate',authenticate,deactivateProfile);
 export default userRouter;
