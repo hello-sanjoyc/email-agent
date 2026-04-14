@@ -6,10 +6,11 @@ import { IAiService } from '../ai.interface';
 export class GroqService implements IAiService{
     private client = new Groq({apiKey:env.GROQ_API_KEY});
     private systemPrompt = systemPrompt;
-    generateUserPrompt(subject:string,date:string,bodySummary:string):string{
-        return `Date: ${date}
+    generateUserPrompt(subject: string, date: string, bodySummary: string, today: string): string {
+        return `Today's date (UTC): ${today}
+        Email received: ${date}
         Subject: ${subject}
-        Body: ${bodySummary}`
+        Body: ${bodySummary}`;
     }
     async classifyEmail(userPrompt:string):Promise<EmailClassificationOutput>{
         const response = await this.client.chat.completions.create({

@@ -65,10 +65,9 @@ export class EmailService {
             params: {
                 '$filter': 'isRead eq false',
                 '$top': readCount, // Matching your messages.slice(0, 5)
-                '$select': 'id,subject,from,toRecipients,receivedDateTime,body,bodyPreview'
+                '$select': 'id,subject,from,sender,toRecipients,receivedDateTime,body,bodyPreview,internetMessageHeaders'
             }
         });
-        
         return response.data.value.map((msg) =>{
             const toStr = (msg.toRecipients || [])
             .map(recipient => this.formatAddress(recipient))
@@ -77,12 +76,16 @@ export class EmailService {
             .replace(/<[^>]*>?/gm, ' ') // Strip HTML tags
             .replace(/\s+/g, ' ')       // Remove extra whitespace
             .trim();
+            const dateHeader = msg.internetMessageHeaders?.find(
+                h => h.name.toLowerCase() === 'date'
+            );
+            const originalDate = dateHeader?.value || msg.receivedDateTime;
             return {
                 messageID: msg.id,
                 from: msg.sender.emailAddress.address,
                 to:toStr,
                 subject: msg.subject,
-                date: msg.receivedDateTime,
+                date: originalDate,
                 shortened_body: plainText.substring(0,500),
                 forward_html: msg.body.content,
                 forward_text: plainText,
@@ -90,6 +93,10 @@ export class EmailService {
                 attachments: [] // Graph attachments require a separate call
             };   
         });
+    }
+    private getHeaderString(val: string | string[] | undefined): string {
+        if (!val) return '';
+        return Array.isArray(val) ? (val[0] ?? '') : val;
     }
 
     /**
@@ -141,11 +148,11 @@ export class EmailService {
             const parsed = await simpleParser(textPart?.body || '');
 
             return {
-                messageID: header['message-id'] || '',
-                from: header.from || '',
-                to: header.to || '',
-                subject: header.subject || '',
-                date: header.date || '',
+                messageID: this.getHeaderString(header['message-id']) || '',
+                from: this.extractEmail(this.getHeaderString(header.from)) || '',
+                to: this.extractEmail(this.getHeaderString(header.to)) || '',
+                subject: this.getHeaderString(header.subject) || '',
+                date: this.getHeaderString(header.date) || '',
                 shortened_body: parsed.text ? parsed.text.trim().substring(0, 500) : this.cleanEmailBody(parsed.html || '').substring(0, 500),
                 forward_text: parsed.text || '',
                 forward_html: parsed.html || '',

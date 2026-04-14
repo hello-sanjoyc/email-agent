@@ -88,11 +88,12 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
         //decide action and then act based on that action
         let actionResultBag:ActionResultBagItem[]=[];
         let actionResult:ActionResultBagItem;
+        const today = new Date().toISOString().split('T')[0]
         for(let msg of messages){
             //extract the message id. it seems like it is coming as array in runtime for IMAP cases. so we will handle both to clarify the issue once in for all
             const message_id = Array.isArray(msg.messageID)?msg.messageID[0]:msg.messageID; 
             //generate user prompt
-            const userPrompt = ai.generateUserPrompt(msg.subject,msg.date,msg.shortened_body);
+            const userPrompt = ai.generateUserPrompt(msg.subject,msg.date,msg.shortened_body,today);
             //ask ai to generate an object indicating what action to take
             const actionObject = await ai.classifyEmail(userPrompt);
             switch(actionObject.action){

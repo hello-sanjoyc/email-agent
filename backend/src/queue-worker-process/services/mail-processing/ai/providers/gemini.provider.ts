@@ -7,10 +7,11 @@ import { systemPrompt } from "../prompts";
 export class GeminiService implements IAiService {
     private systemPrompt = systemPrompt;
     private client = new GoogleGenAI({apiKey:env.GEMINI_API_KEY});    
-    generateUserPrompt(subject:string,date:string,bodySummary:string):string{
-        return `Date: ${date}
-        Subject: ${subject} 
-        Body: ${bodySummary}`
+    generateUserPrompt(subject: string, date: string, bodySummary: string, today: string): string {
+        return `Today's date (UTC): ${today}
+        Email received: ${date}
+        Subject: ${subject}
+        Body: ${bodySummary}`;
     }
     async classifyEmail(userPrompt: string): Promise<EmailClassificationOutput> {        
         const result = await this.client.models.generateContent({

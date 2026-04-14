@@ -9,6 +9,7 @@ export interface MicrosoftGetMessageResponse {
             "@odata.etag": string;
             id: string;
             internetMessageId:string;
+            internetMessageHeaders?: { name: string; value: string }[];
             subject:string;
             toRecipients:{emailAddress:{name:string;address:string;}}[];
             receivedDateTime:string;
