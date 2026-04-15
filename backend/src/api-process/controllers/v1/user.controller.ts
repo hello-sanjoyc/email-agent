@@ -353,7 +353,7 @@ export const updateEmailAccount = async (req:Request,res:Response,next:NextFunct
         const emailAccId = req.params.id as string;
         if(!userId) throw new AppError("Invalid user",400);
         if(!emailAccId) throw new AppError("Invalid email account",400);
-        await updateEmailAccountData(userId,emailAccId,input.email,input.password);
+        await updateEmailAccountData(userId,emailAccId,input);
         return res.status(200).json({
             error:false,
             message:"Email account updated successfully"

@@ -1,4 +1,4 @@
-import { fetchAiResponseToneByIDRes, fetchAiServiceByIDRes, PriorityUpdate } from "../controllers/v1/types";
+import { fetchAiResponseToneByIDRes, fetchAiServiceByIDRes, PriorityUpdate, UpdateEmailAccountIntput } from "../controllers/v1/types";
 import db from "../../db"
 import { AIResponseTone, Prisma } from "../../generated/prisma";
 import AppError from "../utils/appError.utils";
@@ -735,6 +735,7 @@ export const triggerEmailProcessingManually = async (userId:string,emailAccId:st
 export const fetchActionItems = async (to:string,from:string,type:string,userId:string):Promise<FetchActionItemsDataFormat[]> => {
     try{
        let actionItemsFilter:any = {};
+       actionItemsFilter.isSeen = false;
        if(type === '0'){
             actionItemsFilter.deadline = {not:null};
        }else if(type === '1'){            
@@ -835,11 +836,18 @@ export const deactivateUser = async (id:string):Promise<boolean> => {
     }
 }
 //updating email account(custom ones)
-export const updateEmailAccountData = async (userId:string,emailAccId:string,email:string,password:string):Promise<boolean> => {
+export const updateEmailAccountData = async (userId:string,emailAccId:string,data:UpdateEmailAccountIntput):Promise<boolean> => {
     try{
         await db.emailAccount.update({
             where:{id:emailAccId,userId},
-            data:{emailAddress:email,appPassword:password}
+            data:{
+                emailAddress:data.email,
+                appPassword:data.password,
+                imapHost:data.imap_host,
+                imapPort:data.imapt_port,
+                smtpHost:data.smtp_host,
+                smtpPort:data.smtp_port
+            }
         });
         return true;
     }catch(err){

@@ -63,5 +63,24 @@ export const updateEmailAccountValidationRules = [
   .normalizeEmail({ gmail_remove_dots: false }),
    body('password')
   .notEmpty().withMessage('Password is required').bail()
-  .isString().withMessage('Password must be a string').bail(), 
+  .isString().withMessage('Password must be a string').bail(),
+  // --- IMAP Configuration ---
+  body('imap_host')
+    .notEmpty().withMessage('IMAP host is required').bail()
+    .isFQDN().withMessage('IMAP host must be a valid domain (e.g., imap.gmail.com)').bail(),
+  
+  body('imap_port')
+    .notEmpty().withMessage('IMAP port is required').bail()
+    .isInt({ min: 1, max: 65535 }).withMessage('IMAP port must be a number between 1 and 65535').bail()
+    .toInt(),
+
+  // --- SMTP Configuration ---
+  body('smtp_host')
+    .notEmpty().withMessage('SMTP host is required').bail()
+    .isFQDN().withMessage('SMTP host must be a valid domain (e.g., smtp.gmail.com)').bail(),
+  
+  body('smtp_port')
+    .notEmpty().withMessage('SMTP port is required').bail()
+    .isInt({ min: 1, max: 65535 }).withMessage('SMTP port must be a number between 1 and 65535').bail()
+    .toInt(), 
 ]
