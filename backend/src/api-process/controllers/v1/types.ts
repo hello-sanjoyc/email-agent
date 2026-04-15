@@ -121,3 +121,7 @@ export interface fetchAiServiceByIDRes {
     name:string;    
     isActive:boolean;
 }
+export interface UpdateEmailAccountIntput{
+    email:string;
+    password:string;
+}

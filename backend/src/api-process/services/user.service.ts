@@ -834,3 +834,15 @@ export const deactivateUser = async (id:string):Promise<boolean> => {
         throw err;
     }
 }
+//updating email account(custom ones)
+export const updateEmailAccountData = async (userId:string,emailAccId:string,email:string,password:string):Promise<boolean> => {
+    try{
+        await db.emailAccount.update({
+            where:{id:emailAccId,userId},
+            data:{emailAddress:email,appPassword:password}
+        });
+        return true;
+    }catch(err){
+        throw err;
+    }
+}

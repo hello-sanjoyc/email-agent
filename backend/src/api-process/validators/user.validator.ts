@@ -1,4 +1,4 @@
-import { body, query } from 'express-validator';
+import { body, param, query } from 'express-validator';
 export const linkAccountValidationRule = [
   body('access_token')
   .notEmpty().withMessage('Access token is required').bail(),
@@ -54,4 +54,14 @@ export const getServiceStatsValidationRules = [
   .isISO8601().withMessage('Invalid date format').bail(),
   query("from").optional()
   .isISO8601().withMessage('Invalid date format').bail()
+]
+export const updateEmailAccountValidationRules = [
+  param("id").isUUID().withMessage("id passed as param must be an UUID").bail(),
+  body('email')
+  .notEmpty().withMessage('Email is required').bail()
+  .isEmail().withMessage('Email must be a valid email address').bail()
+  .normalizeEmail({ gmail_remove_dots: false }),
+   body('password')
+  .notEmpty().withMessage('Password is required').bail()
+  .isString().withMessage('Password must be a string').bail(), 
 ]

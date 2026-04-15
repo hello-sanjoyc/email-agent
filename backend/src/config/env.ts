@@ -39,7 +39,8 @@ const envSchema = z.object({
     ACTIVE_AI_PROVIDER:z.string().default(""),
     REDIS_USERNAME:z.string().default(""),
     REDIS_PASSWORD:z.string().default(""),
-    ADMIN_EMAIL:z.string().default("")
+    ADMIN_EMAIL:z.string().default(""),
+    RAZORPAY_WEBHOOK_SECRET:z.string().default("")
 });
 
 const env = envSchema.parse(process.env);

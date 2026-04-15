@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { getProfile, getUserAccounts, linkAccount,getUserCalendarAccounts,linkCalendarAccount, toggleAccountStatus, toggleCalendarAccountStatus,getServiceStats,updateProfile, getAIResponseTones, changeAIResponseTone, toggleAutomationStatus, updateEmailAccountsPriority, deleteEmailAccount, deleteCalendarAccount, getAIServices, changeAIService, getActionItems, toggleIsSeenOfActionItem, deactivateProfile } from '../../controllers/v1/user.controller.js';
+import { getProfile, getUserAccounts, linkAccount,getUserCalendarAccounts,linkCalendarAccount, toggleAccountStatus, toggleCalendarAccountStatus,getServiceStats,updateProfile, getAIResponseTones, changeAIResponseTone, toggleAutomationStatus, updateEmailAccountsPriority, deleteEmailAccount, deleteCalendarAccount, getAIServices, changeAIService, getActionItems, toggleIsSeenOfActionItem, deactivateProfile, updateEmailAccount } from '../../controllers/v1/user.controller.js';
 import { authenticate } from '../../middlewares/authentication.js';
-import { getServiceStatsValidationRules, updateEmailAccountsPriorityValidationRules } from '../../validators/user.validator.js';
+import { getServiceStatsValidationRules, updateEmailAccountsPriorityValidationRules, updateEmailAccountValidationRules } from '../../validators/user.validator.js';
 import { checkRouteValidity } from '../../middlewares/validationMiddleware.js';
 // import { linkAccountValidationRule } from '../../validators/user.validator.js';
 // import { checkRouteValidity } from '../../middlewares/validationMiddleware.js';
@@ -48,4 +48,6 @@ userRouter.get('/action-items',authenticate,getActionItems);
 userRouter.put('/action-item/seen/toggle/:id',authenticate,toggleIsSeenOfActionItem);
 //deactivate profile
 userRouter.post('/profile/deactivate',authenticate,deactivateProfile);
+//custom email account update
+userRouter.patch('/email-account/:id',authenticate,updateEmailAccountValidationRules,checkRouteValidity,updateEmailAccount);
 export default userRouter;

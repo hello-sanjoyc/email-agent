@@ -124,12 +124,12 @@ export const verifySubscription = async (req:Request,res:Response,next:NextFunct
 export const respondToWebhook = async (req:Request,res:Response,next:NextFunction) => {
     try{
         const requestSignature = req.headers["x-razorpay-signature"] as string;
-        const razorpaySecret = env.RAZORPAY_SECRET;
+        const razorpaySecret = env.RAZORPAY_WEBHOOK_SECRET;
         const rawBody = req.rawBody;
         if(!rawBody) throw new AppError("Invalid Request",400);
         if(!razorpaySecret) throw new AppError("Server Misconfiguration",400);   
         const payloadSignature = crypto.createHmac("sha256",razorpaySecret).update(rawBody).digest("hex");
-        if(payloadSignature !== requestSignature) throw new AppError("Invalid signature",500);
+        if(payloadSignature !== requestSignature) throw new AppError("Invalid signature",400);
         const payloadObject = JSON.parse(rawBody.toString()) as RazorpayJobPayload;
         const razorpayWebhookProcessingQueue = getRazorpayWebhookProcessingQueue();
         await razorpayWebhookProcessingQueue.add("razorpay-webhook-processing",payloadObject);

@@ -1,5 +1,5 @@
 import { Job, Worker } from "bullmq";
-import { RazorpayJobPayload } from "./types";
+import { RazorpayJobPayload, RazorpayWebhookEvent } from "./types";
 import { redisConnection } from "../config/redis";
 import { logger } from "../config/logger";
 import subscriptionRenewalTemplate from "../mail/templates/subscriptionRenewal.template";
@@ -23,7 +23,7 @@ const razorpayWebhookProcessor =async (job:Job<RazorpayJobPayload>):Promise<void
         const rzpPrice = job.data.payload.payment?.entity.amount;
         const emailSendingQueue = getEmailSendingQueue();
         switch(event){
-            case "subscription.charged":
+            case RazorpayWebhookEvent.SUBSCRIPTION_CHARGED:
                 if(!rzpPrice){
                     throw new Error("Invalid Price");
                 }
@@ -53,7 +53,7 @@ const razorpayWebhookProcessor =async (job:Job<RazorpayJobPayload>):Promise<void
                     content: emailContent
                 });                
                 break;
-            case "subscription.activated":
+            case RazorpayWebhookEvent.SUBSCRIPTION_ACTIVATED:
                 const activatedSubscriptionData = await handleRazorpayActivatedEvent(rzpSubscriptionId);
                 await emailSendingQueue.add("email-sending",{
                     to:activatedSubscriptionData.user.email,
@@ -63,7 +63,7 @@ const razorpayWebhookProcessor =async (job:Job<RazorpayJobPayload>):Promise<void
                     ])
                 });                
                 break;
-            case "subscription.halted":
+            case RazorpayWebhookEvent.SUBSCRIPTION_HALTED:
                 const rzpSub = (await razorpay.subscriptions.fetch(rzpSubscriptionId));
                 const razorpayBillingUrl = rzpSub.short_url || `${env.FRONTEND_URL}/billings`
                 const haltedSubscriptionData = await handleRazorpayHaltedEvent(rzpSubscriptionId);                
@@ -73,7 +73,7 @@ const razorpayWebhookProcessor =async (job:Job<RazorpayJobPayload>):Promise<void
                     content: subscriptionHaltedTemplate(haltedSubscriptionData.user.name || 'User', haltedSubscriptionData.plan.name, razorpayBillingUrl)
                 }); 
                 break;
-            case "subscription.cancelled":
+            case RazorpayWebhookEvent.SUBSCRIPTION_CANCELLED:
                 const cancelledSubscriptionData = await handleRazorpayCancelledEvent(rzpSubscriptionId);
                 await emailSendingQueue.add(
                     'email-sending',

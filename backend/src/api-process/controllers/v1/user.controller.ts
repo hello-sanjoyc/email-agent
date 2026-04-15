@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../../utils/appError.utils";
-import { changeIsSeenOfActionItem, changeProfileAIResponseTone, changeProfileAIService, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, deactivateUser, doesAnyEmailAccExist, fetchActionItems, fetchAiResponseToneByID, fetchAiServiceByID, fetchAIServicesDataset, fetchAIToneDataset, fetchEmailAccount, fetchUserData, findActionItemById, generateStats, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, triggerEmailProcessingManually, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
-import { ChangeAIResponseToneInput, ChangeAIServiceInput, LinkAccountInput,LinkCalendarAccountInput, ToggleAutomationStatus, UpdateEmailAccountsPriorityInput, UpdateProfileInput } from "./types";
+import { changeIsSeenOfActionItem, changeProfileAIResponseTone, changeProfileAIService, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, deactivateUser, doesAnyEmailAccExist, fetchActionItems, fetchAiResponseToneByID, fetchAiServiceByID, fetchAIServicesDataset, fetchAIToneDataset, fetchEmailAccount, fetchUserData, findActionItemById, generateStats, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, triggerEmailProcessingManually, updateEmailAccountData, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
+import { ChangeAIResponseToneInput, ChangeAIServiceInput, LinkAccountInput,LinkCalendarAccountInput, ToggleAutomationStatus, UpdateEmailAccountIntput, UpdateEmailAccountsPriorityInput, UpdateProfileInput } from "./types";
 import { LinkAccountFactory } from "../../services/link-account/factory";
 import { LinkCalendarAccountFactory } from "../../services/link-calendar-account/factory";
 import { isEmailUsed } from "../../services/auth.service";
@@ -340,6 +340,23 @@ export const deactivateProfile = async (req:Request,res:Response,next:NextFuncti
         return res.status(200).json({
             error:false,
             message:"Profile deactivated successfully"
+        });
+    }catch(err){
+        next(err);
+    }
+}
+//update details of email account(currently only done for custom)
+export const updateEmailAccount = async (req:Request,res:Response,next:NextFunction) => {
+    try{
+        const input = req.body as UpdateEmailAccountIntput;
+        const userId = req.user?.id;
+        const emailAccId = req.params.id as string;
+        if(!userId) throw new AppError("Invalid user",400);
+        if(!emailAccId) throw new AppError("Invalid email account",400);
+        await updateEmailAccountData(userId,emailAccId,input.email,input.password);
+        return res.status(200).json({
+            error:false,
+            message:"Email account updated successfully"
         });
     }catch(err){
         next(err);

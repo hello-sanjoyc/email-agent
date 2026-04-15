@@ -6,13 +6,10 @@ export const handleRazorpayChargedEvent = async (
 ) => {
     try{
         const chargedSubscriptionData = await db.$transaction(async (tx) => {
-            const subscriptionData = await tx.subscription.findFirst({
+            const subscriptionData = await tx.subscription.findUnique({
                 where:{
                     gatewaySubscriptionId:rzpSubscriptionId,
-                },
-                orderBy:{
-                    createdAt:"desc"
-                },
+                },                
                 select:{
                     id:true,
                     userId:true,
@@ -61,7 +58,8 @@ export const handleRazorpayChargedEvent = async (
                     amount:subscriptionData.plan.price,
                     status:"SUCCESS",
                     gatewayOrderId:rzpSubscriptionId,
-                    gatewaySignature:"RZP_RECURRING_WEBHOOK"
+                    gatewaySignature:"RZP_RECURRING_WEBHOOK",
+                    gatewayPaymentId:rzpPaymentId
                 }
             });
             return subscriptionData;
