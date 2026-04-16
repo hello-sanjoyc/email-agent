@@ -846,7 +846,7 @@ export const updateEmailAccountData = async (userId:string,emailAccId:string,dat
                 emailAddress:data.email,
                 appPassword:data.password,
                 imapHost:data.imap_host,
-                imapPort:data.imapt_port,
+                imapPort:data.imap_port,
                 smtpHost:data.smtp_host,
                 smtpPort:data.smtp_port
             }

@@ -125,7 +125,7 @@ export interface UpdateEmailAccountIntput{
     email:string;
     password:string;
     imap_host:string;
-    imapt_port:number;
+    imap_port:number;
     smtp_host:string;
     smtp_port:number;
 }
