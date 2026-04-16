@@ -737,7 +737,9 @@ export const fetchActionItems = async (to:string,from:string,type:string,userId:
        let actionItemsFilter:any = {};
        actionItemsFilter.isSeen = false;
        if(type === '0'){
-            actionItemsFilter.deadline = {not:null};
+            const today = new Date();
+            today.setUTCHours(0,0,0,0);
+            actionItemsFilter.deadline = {gte:today};
        }else if(type === '1'){            
             actionItemsFilter.deadline = null;
             if (to || from) {
