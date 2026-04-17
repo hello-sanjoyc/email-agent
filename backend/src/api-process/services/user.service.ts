@@ -757,8 +757,7 @@ export const fetchActionItems = async (to:string,from:string,type:string,userId:
             }
        }       
        const data = await db.user.findFirst({
-        where:{id:userId},
-        orderBy:orderby,
+        where:{id:userId},        
         select:{
             id:true,
             name:true,
@@ -767,6 +766,7 @@ export const fetchActionItems = async (to:string,from:string,type:string,userId:
                 select:{
                     actionItems:{
                         where:actionItemsFilter,
+                        orderBy:orderby,
                         select:{
                             id:true,
                             emailActivityId:true,
