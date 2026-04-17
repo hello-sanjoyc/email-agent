@@ -175,6 +175,9 @@ export interface ActionItem {
 export interface ActionResultBagItem {
     isCompleted:boolean;
     messageID:string;
+    messageDate:string;
+    messageSubject:string;
+    messageSender:string;
     action:string;
     reason:string;
     actionItems: ActionItem[];

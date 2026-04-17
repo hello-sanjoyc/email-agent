@@ -17,6 +17,9 @@ export interface EmailActivityCreationDataset{
   planId:string | null;
   subscriptionId:string | null;
   messageId:string;
+  messageSender:string | null;
+  messageSubject:string | null;
+  messageDate: Date | null;
   action:string;
   reason:string | null;
   isCompleted:boolean;

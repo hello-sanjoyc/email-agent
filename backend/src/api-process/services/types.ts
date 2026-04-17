@@ -157,3 +157,12 @@ export interface FetchActionItemsDataFormat {
     isSeen: boolean;
     id:string;
 }
+export interface FetchEmailActivityResponse {
+    id: string;
+    messageSender: string | null;
+    messageSubject: string | null;
+    messageDate: Date | null;
+    action: string;
+    reason: string | null;
+    processedAt: Date;
+}

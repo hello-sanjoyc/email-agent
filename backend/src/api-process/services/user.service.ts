@@ -4,7 +4,7 @@ import { AIResponseTone, Prisma } from "../../generated/prisma";
 import AppError from "../utils/appError.utils";
 import { LinkAccountResponse } from "./link-account/types";
 import { LinkCalendarAccountResponse } from "./link-calendar-account/types";
-import { EmailAccountData,FetchActionItemsDataFormat,FetchAIServiceDatasetEach,FetchAIToneDatasetEach,GenerateStatsResponse, UserData, UserDataByEmail, UserProfileData } from "./types";
+import { EmailAccountData,FetchActionItemsDataFormat,FetchAIServiceDatasetEach,FetchAIToneDatasetEach,FetchEmailActivityResponse,GenerateStatsResponse, UserData, UserDataByEmail, UserProfileData } from "./types";
 import { EmailProcessingPayload } from "../../types/types";
 import env from "../../config/env";
 import { getEmailProcessingQueue } from "../../queues/emailProcessingQueue";
@@ -736,7 +736,7 @@ export const fetchActionItems = async (to:string,from:string,type:string,userId:
     try{
         // We query ActionItems directly, filtering by the User who owns the EmailActivity
         let actionItemsFilter: any = {
-            isSeen: false,
+            // isSeen: false,
             emailActivity: {
                 userId: userId // Adjust this if your relation name is different in schema.prisma
             }
@@ -745,8 +745,11 @@ export const fetchActionItems = async (to:string,from:string,type:string,userId:
 
         if (type === '0') {
             const today = new Date();
+            const sevenDaysLater = new Date();
+            sevenDaysLater.setDate(sevenDaysLater.getDate() + 7);
             today.setUTCHours(0, 0, 0, 0);
-            actionItemsFilter.deadline = { gte: today };
+            sevenDaysLater.setUTCHours(23,59,59,999);
+            actionItemsFilter.deadline = { gte: today, lte: sevenDaysLater };
             orderby.push({ deadline: 'asc' }, { priority: 'asc' });            
         } else if (type === '1') {
             orderby.push({ priority: 'asc' });            
@@ -851,6 +854,32 @@ export const updateEmailAccountData = async (userId:string,emailAccId:string,dat
             }
         });
         return true;
+    }catch(err){
+        throw err;
+    }
+}
+//fetch email activity based on filters
+export const fetchEmailActivity = async (userId:string,type:string,to:string,from:string):Promise<FetchEmailActivityResponse[]> => {
+    try{
+        let whereClause:any;
+        whereClause.userId = userId;
+        whereClause.isCompleted = true;
+        if(type) whereClause.action = type;
+        if(to) whereClause.processedAt.lte = new Date(`${to}T23:59:59.999Z`);
+        if(from) whereClause.processedAt.gte = new Date(`${to}T00:00:00.000Z`);
+        const data = await db.emailActivity.findMany({
+            where:whereClause,
+            select:{
+                id:true,
+                messageSender:true,
+                messageSubject:true,
+                messageDate:true,
+                processedAt:true,
+                action:true,
+                reason:true    
+            }
+        });
+        return data;
     }catch(err){
         throw err;
     }

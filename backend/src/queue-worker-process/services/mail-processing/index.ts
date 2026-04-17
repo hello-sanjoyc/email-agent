@@ -121,6 +121,9 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         actionResult ={
                             action:actionObject.action,
                             messageID:message_id,
+                            messageDate:msg.date,
+                            messageSubject:msg.subject,
+                            messageSender:msg.from,
                             reason:actionObject.reason,
                             isCompleted:true,
                             actionItems:actionObject.action_items ?? []
@@ -129,6 +132,9 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                          actionResult ={
                             action:actionObject.action,
                             messageID:message_id,
+                            messageDate:msg.date,
+                            messageSubject:msg.subject,
+                            messageSender:msg.from,
                             reason:actionObject.reason,
                             isCompleted:false,
                             actionItems:actionObject.action_items ?? []
@@ -159,6 +165,9 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         actionResult ={
                             action:actionObject.action,
                             messageID:message_id,
+                            messageDate:msg.date,
+                            messageSubject:msg.subject,
+                            messageSender:msg.from,
                             reason:actionObject.reason,
                             isCompleted:true,
                             actionItems:actionObject.action_items ?? []
@@ -167,6 +176,9 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         actionResult ={
                             action:actionObject.action,
                             messageID:message_id,
+                            messageDate:msg.date,
+                            messageSubject:msg.subject,
+                            messageSender:msg.from,
                             reason:actionObject.reason,
                             isCompleted:false,
                             actionItems:actionObject.action_items ?? []
@@ -202,6 +214,9 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         actionResult ={
                             action:actionObject.action,
                             messageID:message_id,
+                            messageDate:msg.date,
+                            messageSubject:msg.subject,
+                            messageSender:msg.from,
                             reason:actionObject.reason,
                             isCompleted:true,
                             actionItems:actionObject.action_items ?? []
@@ -210,6 +225,9 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         actionResult ={
                             action:actionObject.action,
                             messageID:message_id,
+                            messageDate:msg.date,
+                            messageSubject:msg.subject,
+                            messageSender:msg.from,
                             reason:actionObject.reason,
                             isCompleted:false,
                             actionItems:actionObject.action_items ?? []
@@ -262,6 +280,9 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         actionResult ={
                             action:actionObject.action,
                             messageID:message_id,
+                            messageDate:msg.date,
+                            messageSubject:msg.subject,
+                            messageSender:msg.from,
                             reason:actionObject.reason,
                             isCompleted:true,
                             actionItems:actionObject.action_items ?? []
@@ -270,6 +291,9 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                         actionResult ={
                             action:actionObject.action,
                             messageID:message_id,
+                            messageDate:msg.date,
+                            messageSubject:msg.subject,
+                            messageSender:msg.from,
                             reason:actionObject.reason,
                             isCompleted:false,
                             actionItems:actionObject.action_items ?? []
@@ -281,6 +305,9 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     actionResult ={
                         action:actionObject.action,
                         messageID:message_id,
+                        messageDate:msg.date,
+                        messageSubject:msg.subject,
+                        messageSender:msg.from,
                         reason:actionObject.reason,
                         isCompleted:true,
                         actionItems:actionObject.action_items ?? []
@@ -291,6 +318,9 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     actionResult ={
                         action:actionObject.action,
                         messageID:message_id,
+                        messageDate:msg.date,
+                        messageSubject:msg.subject,
+                        messageSender:msg.from,
                         reason:actionObject.reason,
                         isCompleted:true,
                         actionItems:actionObject.action_items ?? []
@@ -300,6 +330,9 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
                     actionResult = {
                         action:actionObject.action,
                         messageID:message_id,
+                        messageDate:msg.date,
+                        messageSubject:msg.subject,
+                        messageSender:msg.from,
                         reason:actionObject.reason,
                         isCompleted:true,
                         actionItems:actionObject.action_items ?? []

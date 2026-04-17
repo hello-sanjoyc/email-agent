@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../../utils/appError.utils";
-import { changeIsSeenOfActionItem, changeProfileAIResponseTone, changeProfileAIService, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, deactivateUser, doesAnyEmailAccExist, fetchActionItems, fetchAiResponseToneByID, fetchAiServiceByID, fetchAIServicesDataset, fetchAIToneDataset, fetchEmailAccount, fetchUserData, findActionItemById, generateStats, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, triggerEmailProcessingManually, updateEmailAccountData, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
+import { changeIsSeenOfActionItem, changeProfileAIResponseTone, changeProfileAIService, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, deactivateUser, doesAnyEmailAccExist, fetchActionItems, fetchAiResponseToneByID, fetchAiServiceByID, fetchAIServicesDataset, fetchAIToneDataset, fetchEmailAccount, fetchEmailActivity, fetchUserData, findActionItemById, generateStats, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, triggerEmailProcessingManually, updateEmailAccountData, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
 import { ChangeAIResponseToneInput, ChangeAIServiceInput, LinkAccountInput,LinkCalendarAccountInput, ToggleAutomationStatus, UpdateEmailAccountIntput, UpdateEmailAccountsPriorityInput, UpdateProfileInput } from "./types";
 import { LinkAccountFactory } from "../../services/link-account/factory";
 import { LinkCalendarAccountFactory } from "../../services/link-calendar-account/factory";
@@ -358,6 +358,25 @@ export const updateEmailAccount = async (req:Request,res:Response,next:NextFunct
             error:false,
             message:"Email account updated successfully"
         });
+    }catch(err){
+        next(err);
+    }
+}
+
+//get email activity data of user, based on category
+export const getEmailActivity = async (req:Request,res:Response,next:NextFunction) => {
+    try{
+        const userId = req.user?.id;
+        const type = req.query.type as string;
+        const to = req.query.to as string;
+        const from = req.query.from as string;
+        if(!userId) throw new AppError('Invalid user',400);
+        const data = await fetchEmailActivity(userId,type,to,from);
+        return res.status(200).json({
+            error:false,
+            message:"data fetched",
+            data
+        });        
     }catch(err){
         next(err);
     }

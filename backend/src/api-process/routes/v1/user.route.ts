@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getProfile, getUserAccounts, linkAccount,getUserCalendarAccounts,linkCalendarAccount, toggleAccountStatus, toggleCalendarAccountStatus,getServiceStats,updateProfile, getAIResponseTones, changeAIResponseTone, toggleAutomationStatus, updateEmailAccountsPriority, deleteEmailAccount, deleteCalendarAccount, getAIServices, changeAIService, getActionItems, toggleIsSeenOfActionItem, deactivateProfile, updateEmailAccount } from '../../controllers/v1/user.controller.js';
+import { getProfile, getUserAccounts, linkAccount,getUserCalendarAccounts,linkCalendarAccount, toggleAccountStatus, toggleCalendarAccountStatus,getServiceStats,updateProfile, getAIResponseTones, changeAIResponseTone, toggleAutomationStatus, updateEmailAccountsPriority, deleteEmailAccount, deleteCalendarAccount, getAIServices, changeAIService, getActionItems, toggleIsSeenOfActionItem, deactivateProfile, updateEmailAccount, getEmailActivity } from '../../controllers/v1/user.controller.js';
 import { authenticate } from '../../middlewares/authentication.js';
 import { getServiceStatsValidationRules, updateEmailAccountsPriorityValidationRules, updateEmailAccountValidationRules } from '../../validators/user.validator.js';
 import { checkRouteValidity } from '../../middlewares/validationMiddleware.js';
@@ -50,4 +50,6 @@ userRouter.put('/action-item/seen/toggle/:id',authenticate,toggleIsSeenOfActionI
 userRouter.post('/profile/deactivate',authenticate,deactivateProfile);
 //custom email account update
 userRouter.patch('/email-account/:id',authenticate,updateEmailAccountValidationRules,checkRouteValidity,updateEmailAccount);
+//fetch email activity data
+userRouter.get('/email-activities',authenticate,getEmailActivity);
 export default userRouter;
