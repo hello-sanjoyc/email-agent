@@ -4,7 +4,7 @@ import { AIResponseTone, Prisma } from "../../generated/prisma";
 import AppError from "../utils/appError.utils";
 import { LinkAccountResponse } from "./link-account/types";
 import { LinkCalendarAccountResponse } from "./link-calendar-account/types";
-import { EmailAccountData,FetchActionItemsDataFormat,FetchAIServiceDatasetEach,FetchAIToneDatasetEach,FetchEmailActivityResponse,GenerateStatsResponse, UserData, UserDataByEmail, UserProfileData } from "./types";
+import { EmailAccountData,FetchActionItemsDataFormat,FetchAIServiceDatasetEach,FetchAIToneDatasetEach,FetchEmailActivityResponse,GenerateStatsResponse, PaginatedEmailActivityResponse, UserData, UserDataByEmail, UserProfileData } from "./types";
 import { EmailProcessingPayload } from "../../types/types";
 import env from "../../config/env";
 import { getEmailProcessingQueue } from "../../queues/emailProcessingQueue";
@@ -859,8 +859,9 @@ export const updateEmailAccountData = async (userId:string,emailAccId:string,dat
     }
 }
 //fetch email activity based on filters
-export const fetchEmailActivity = async (userId:string,type:string,to:string,from:string):Promise<FetchEmailActivityResponse[]> => {
+export const fetchEmailActivity = async (userId:string,type:string,to:string,from:string,page:number=1,limit:number=10):Promise<PaginatedEmailActivityResponse> => {
     try{
+        const skip = (page-1) * limit;
         let whereClause:any= {
             userId,
             isCompleted:true
@@ -870,20 +871,33 @@ export const fetchEmailActivity = async (userId:string,type:string,to:string,fro
             whereClause.processedAt = {};
             if(to) whereClause.processedAt.lte = new Date(`${to}T23:59:59.999Z`);
             if(from) whereClause.processedAt.gte = new Date(`${from}T00:00:00.000Z`);
-        }        
-        const data = await db.emailActivity.findMany({
-            where:whereClause,
-            select:{
-                id:true,
-                messageSender:true,
-                messageSubject:true,
-                messageDate:true,
-                processedAt:true,
-                action:true,
-                reason:true    
-            }
-        });
-        return data;
+        }
+        const [totalCount,concernedData] = await db.$transaction([
+            db.emailActivity.count({
+                where:whereClause
+            }),
+            db.emailActivity.findMany({
+                where:whereClause,
+                skip,
+                take:limit,
+                orderBy: { processedAt: 'desc' },
+                select:{
+                    id:true,
+                    messageSender:true,
+                    messageSubject:true,
+                    messageDate:true,
+                    processedAt:true,
+                    action:true,
+                    reason:true    
+                }
+            })
+        ]);                
+        return {data:concernedData,meta:{
+            total:totalCount,
+            page,
+            limit,
+            totalPages:Math.ceil(totalCount/limit)
+        }};
     }catch(err){
         throw err;
     }

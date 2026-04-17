@@ -370,8 +370,10 @@ export const getEmailActivity = async (req:Request,res:Response,next:NextFunctio
         const type = req.query.type as string;
         const to = req.query.to as string;
         const from = req.query.from as string;
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = parseInt(req.query.limit as string) || 10;
         if(!userId) throw new AppError('Invalid user',400);
-        const data = await fetchEmailActivity(userId,type,to,from);
+        const data = await fetchEmailActivity(userId,type,to,from,page,limit);
         return res.status(200).json({
             error:false,
             message:"data fetched",

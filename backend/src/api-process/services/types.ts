@@ -166,3 +166,12 @@ export interface FetchEmailActivityResponse {
     reason: string | null;
     processedAt: Date;
 }
+export interface PaginatedEmailActivityResponse {
+    data:FetchEmailActivityResponse[];
+    meta:{
+        total:number;
+        page:number;
+        limit:number;
+        totalPages:number;
+    }
+}
