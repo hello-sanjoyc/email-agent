@@ -734,20 +734,26 @@ export const triggerEmailProcessingManually = async (userId:string,emailAccId:st
 //get action items for a user is a proper format
 export const fetchActionItems = async (to:string,from:string,type:string,userId:string):Promise<FetchActionItemsDataFormat[]> => {
     try{
-       let actionItemsFilter:any = {};
-       let orderby:any[] = []; 
-       actionItemsFilter.isSeen = false;
-       if(type === '0'){
+        // We query ActionItems directly, filtering by the User who owns the EmailActivity
+        let actionItemsFilter: any = {
+            isSeen: false,
+            emailActivity: {
+                userId: userId // Adjust this if your relation name is different in schema.prisma
+            }
+        };
+        let orderby: any[] = []; 
+
+        if (type === '0') {
             const today = new Date();
-            today.setUTCHours(0,0,0,0);
-            actionItemsFilter.deadline = {gte:today};
-            orderby.push({deadline:'desc'},{priority:'asc'});
-       }else if(type === '1'){
-            orderby.push({priority:'asc'});            
+            today.setUTCHours(0, 0, 0, 0);
+            actionItemsFilter.deadline = { gte: today };
+            orderby.push({ deadline: 'asc' }, { priority: 'asc' });            
+        } else if (type === '1') {
+            orderby.push({ priority: 'asc' });            
             actionItemsFilter.deadline = null;
+            
             if (to || from) {
                 actionItemsFilter.createdAt = {};
-                
                 if (to) {
                     actionItemsFilter.createdAt.lte = new Date(`${to}T23:59:59.999Z`);
                 }
@@ -755,48 +761,37 @@ export const fetchActionItems = async (to:string,from:string,type:string,userId:
                     actionItemsFilter.createdAt.gte = new Date(`${from}T00:00:00.000Z`);
                 }
             }
-       }       
-       const data = await db.user.findFirst({
-        where:{id:userId},        
-        select:{
-            id:true,
-            name:true,
-            email:true,
-            emailActivities:{
-                select:{
-                    actionItems:{
-                        where:actionItemsFilter,
-                        orderBy:orderby,
-                        select:{
-                            id:true,
-                            emailActivityId:true,
-                            summary:true,
-                            deadline:true,
-                            createdAt:true,
-                            isSeen:true,
-                            priority:true
-                        }
-                    }
-                }
-            }
         }
-       });
-       if(!data) throw new AppError('User not found',404);
-       if(data.emailActivities.length === 0) throw new AppError('No email accounts found',404);
-       const finalData = data.emailActivities.flatMap((eachEmailActivity) => {         
-          const actionItemDataArray = eachEmailActivity.actionItems.map((eachActionItem) => {
-                return {
-                    label:eachActionItem.summary,
-                    priority:eachActionItem.priority,
-                    deadline:eachActionItem.deadline,
-                    dateCreated:eachActionItem.createdAt,
-                    isSeen:eachActionItem.isSeen,
-                    id:eachActionItem.id
-                }
-          });
-          return actionItemDataArray;
-       });
-       return finalData;
+        // Query the ActionItems model
+        const rawActionItems = await db.actionItem.findMany({
+            where: actionItemsFilter,
+            orderBy: orderby,
+            select: {
+                id: true,
+                summary: true,
+                deadline: true,
+                createdAt: true,
+                isSeen: true,
+                priority: true
+            }
+        });
+
+        // If no items are found, you can optionally throw your error here
+        if (rawActionItems.length === 0) {
+            throw new AppError('No action items found', 404);
+        }
+
+        // Map the flat, perfectly sorted array directly to your return format
+        const finalData = rawActionItems.map((item) => ({
+            label: item.summary,
+            priority: item.priority,
+            deadline: item.deadline,
+            dateCreated: item.createdAt,
+            isSeen: item.isSeen,
+            id: item.id
+        }));
+
+        return finalData;     
     }catch(err){
         throw err;
     }
