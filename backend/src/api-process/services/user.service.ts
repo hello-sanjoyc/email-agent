@@ -861,12 +861,16 @@ export const updateEmailAccountData = async (userId:string,emailAccId:string,dat
 //fetch email activity based on filters
 export const fetchEmailActivity = async (userId:string,type:string,to:string,from:string):Promise<FetchEmailActivityResponse[]> => {
     try{
-        let whereClause:any;
-        whereClause.userId = userId;
-        whereClause.isCompleted = true;
+        let whereClause:any= {
+            userId,
+            isCompleted:true
+        };        
         if(type) whereClause.action = type;
-        if(to) whereClause.processedAt.lte = new Date(`${to}T23:59:59.999Z`);
-        if(from) whereClause.processedAt.gte = new Date(`${to}T00:00:00.000Z`);
+        if(to || from){
+            whereClause.processedAt = {};
+            if(to) whereClause.processedAt.lte = new Date(`${to}T23:59:59.999Z`);
+            if(from) whereClause.processedAt.gte = new Date(`${from}T00:00:00.000Z`);
+        }        
         const data = await db.emailActivity.findMany({
             where:whereClause,
             select:{
