@@ -582,14 +582,24 @@ export const generateStats = async (userId:string,to:string,from:string):Promise
             _count:{action:true}  
         });        
         if(emailActivityData.length === 0) throw new AppError('Stats not found',404);
-        const response = emailActivityData.map((each)=>{
-            return {
-                label:StatsLabelActionIconMapper[each.action]?.label || 'Others',
-                iconKey:StatsLabelActionIconMapper[each.action]?.iconKey || 'others',
-                value:each._count.action
+        const emailActionsNames = await db.emailAction.findMany({
+            where:{isActive:true},
+            select:{
+                name:true,
+                label:true
             }
         });
-        return response;
+        const data = emailActionsNames.map((eachEmailAction)=>{
+            const emailActivityEntry = emailActivityData.find((each)=> each.action === eachEmailAction.name);           
+            return {
+                label:eachEmailAction.label || 'Others',
+                iconKey:StatsLabelActionIconMapper[eachEmailAction.name]?.iconKey || 'others',
+                name:eachEmailAction.name,
+                value:(emailActivityEntry !== undefined)?emailActivityEntry._count.action: 0
+
+            }
+        });
+        return data;        
     }catch(err){
         throw err;
     }
