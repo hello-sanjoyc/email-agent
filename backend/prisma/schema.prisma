@@ -187,7 +187,14 @@ model EmailActivity {
   actionItems ActionItem[] 
   @@map("email_activities")
 }
-
+model EmailAction {
+  id String @db.Uuid() @default(dbgenerated("gen_random_uuid()")) @id @map("id")
+  name String @db.VarChar(100) @unique @map("name")  
+  label String @db.VarChar(100) @unique @map("label")
+  isActive Boolean @db.Boolean @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  @@map("email_actions")
+}
 enum AIResponseTone {
   CASUAL
   PROFESSIONAL

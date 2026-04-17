@@ -92,6 +92,12 @@ const processEmailJobs = async (job:Job<EmailProcessingPayload>):Promise<void> =
                 });
             });
         }else{
+            await db.user.update({
+                where:{id:job.data.general_data.user_id},
+                data:{
+                    lastAutomationRanAt:new Date()
+                }
+            });
             logger.info(`[EMAIL-PROCESSING-WORKER] no message activity to add`,{
                 jobId:job.id,
                 userId:job.data.general_data.user_id

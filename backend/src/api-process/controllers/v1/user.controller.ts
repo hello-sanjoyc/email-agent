@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import AppError from "../../utils/appError.utils";
-import { changeIsSeenOfActionItem, changeProfileAIResponseTone, changeProfileAIService, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, deactivateUser, doesAnyEmailAccExist, fetchActionItems, fetchAiResponseToneByID, fetchAiServiceByID, fetchAIServicesDataset, fetchAIToneDataset, fetchEmailAccount, fetchEmailActivity, fetchUserData, findActionItemById, generateStats, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, triggerEmailProcessingManually, updateEmailAccountData, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
+import { changeIsSeenOfActionItem, changeProfileAIResponseTone, changeProfileAIService, createCalendarAccFormEmailAcc, createCalendarAccount, createEmailAccount, deactivateUser, doesAnyEmailAccExist, fetchActionItems, fetchAiResponseToneByID, fetchAiServiceByID, fetchAIServicesDataset, fetchAIToneDataset, fetchEmailAccount, fetchEmailActions, fetchEmailActivity, fetchUserData, findActionItemById, generateStats, getAccounts, getCalendarAccounts, getUserProfile, softOrHardDeleteCalendarAccount, softOrHardDeleteEmailAccount, toggleCalendarAccountState, toggleEmailAccountStatus, triggerEmailProcessingManually, updateEmailAccountData, updateEmailAccountPriorityWeight, updateProfileAutomationStatus, updateUser } from "../../services/user.service";
 import { ChangeAIResponseToneInput, ChangeAIServiceInput, LinkAccountInput,LinkCalendarAccountInput, ToggleAutomationStatus, UpdateEmailAccountIntput, UpdateEmailAccountsPriorityInput, UpdateProfileInput } from "./types";
 import { LinkAccountFactory } from "../../services/link-account/factory";
 import { LinkCalendarAccountFactory } from "../../services/link-calendar-account/factory";
@@ -379,6 +379,20 @@ export const getEmailActivity = async (req:Request,res:Response,next:NextFunctio
             message:"data fetched",
             data
         });        
+    }catch(err){
+        next(err);
+    }
+}
+
+//get all email actions
+export const getEmailActions = async (req:Request,res:Response,next:NextFunction) => {
+    try{
+        const data = await fetchEmailActions();
+        return res.status(200).json({
+            error:false,
+            message:"Email actions fetched",
+            data
+        });
     }catch(err){
         next(err);
     }

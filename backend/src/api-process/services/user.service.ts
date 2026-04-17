@@ -902,3 +902,16 @@ export const fetchEmailActivity = async (userId:string,type:string,to:string,fro
         throw err;
     }
 }
+//fetch email actions
+export const fetchEmailActions = async ():Promise<{id: string;name: string;label: string;}[]> => {
+    try{
+        const data = await db.emailAction.findMany({
+            where:{isActive:true},
+            select:{id:true,name:true,label:true}
+        });
+        if(data.length === 0) throw new AppError("No action found",404);
+        return data;
+    }catch(err){
+        throw err;
+    }
+}
