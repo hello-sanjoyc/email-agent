@@ -735,12 +735,15 @@ export const triggerEmailProcessingManually = async (userId:string,emailAccId:st
 export const fetchActionItems = async (to:string,from:string,type:string,userId:string):Promise<FetchActionItemsDataFormat[]> => {
     try{
        let actionItemsFilter:any = {};
+       let orderby:any[] = []; 
        actionItemsFilter.isSeen = false;
        if(type === '0'){
             const today = new Date();
             today.setUTCHours(0,0,0,0);
             actionItemsFilter.deadline = {gte:today};
-       }else if(type === '1'){            
+            orderby.push({deadline:'desc'},{priority:'asc'});
+       }else if(type === '1'){
+            orderby.push({priority:'asc'});            
             actionItemsFilter.deadline = null;
             if (to || from) {
                 actionItemsFilter.createdAt = {};
@@ -755,6 +758,7 @@ export const fetchActionItems = async (to:string,from:string,type:string,userId:
        }       
        const data = await db.user.findFirst({
         where:{id:userId},
+        orderBy:orderby,
         select:{
             id:true,
             name:true,
