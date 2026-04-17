@@ -586,15 +586,16 @@ export const generateStats = async (userId:string,to:string,from:string):Promise
             where:{isActive:true},
             select:{
                 name:true,
-                label:true
+                label:true,
+                icon:true
             }
         });
         const data = emailActionsNames.map((eachEmailAction)=>{
             const emailActivityEntry = emailActivityData.find((each)=> each.action === eachEmailAction.name);           
             return {
                 label:eachEmailAction.label || 'Others',
-                iconKey:StatsLabelActionIconMapper[eachEmailAction.name]?.iconKey || 'others',
-                name:eachEmailAction.name,
+                iconKey:eachEmailAction.icon || 'others',
+                name:eachEmailAction.name || 'others',
                 value:(emailActivityEntry !== undefined)?emailActivityEntry._count.action: 0
 
             }
