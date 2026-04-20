@@ -138,6 +138,9 @@ export const respondToWebhook = async (req:Request,res:Response,next:NextFunctio
         await razorpayWebhookProcessingQueue.add("razorpay-webhook-processing",payloadObject);
         return res.status(200).send("OK");       
     }catch(err){
+        logger.error("[webhook request] falied",{
+            data:err instanceof Error? err.message:"",
+        });
         next(err);
     }
 }

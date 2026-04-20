@@ -20,7 +20,7 @@ app.use(cors({
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
 }));
-app.use(express.json());
+// app.use(express.json());
 app.use((req:Request,res:Response,next:NextFunction)=>{
     const reqId = uuidv4();
     const store = new Map();
