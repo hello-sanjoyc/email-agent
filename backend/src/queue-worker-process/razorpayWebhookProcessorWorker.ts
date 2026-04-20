@@ -16,6 +16,7 @@ const razorpayWebhookProcessor =async (job:Job<RazorpayJobPayload>):Promise<void
     logger.info(`[RAZORPAY WEBHOOK PROCESSING] processing a job`,{jobId:job.id});
     try{
         const event = job.data.event;
+        logger.info(`[RAZORPAY WEBHOOK PROCESSING] concerned event is: ${event} with job id: ${job.id}`);
         const rzpSubscriptionId = job.data.payload.subscription.entity.id;
         const rzpPaymentId = job.data.payload.payment?.entity.id;
         const rzpSubscriptionStartSeconds = job.data.payload.subscription.entity.current_start;
