@@ -123,6 +123,9 @@ export const verifySubscription = async (req:Request,res:Response,next:NextFunct
 }
 export const respondToWebhook = async (req:Request,res:Response,next:NextFunction) => {
     try{
+        logger.info("[webhook-request] data received",{
+            data:req.body
+        });
         const requestSignature = req.headers["x-razorpay-signature"] as string;
         const razorpaySecret = env.RAZORPAY_WEBHOOK_SECRET;
         const rawBody = req.rawBody;
