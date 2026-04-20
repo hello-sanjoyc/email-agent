@@ -155,8 +155,27 @@ export const registerNewSubscriptionPlan = async (apiInput:VerifySubscriptionInp
                     isActive:true
                 }
             });
-            //create a payment table entry for the newly created subscription 
-            await tx.payment.create({
+            //create a payment table entry for the newly created subscription , if already present(entry already done by webhook), just update it
+            await tx.payment.upsert({
+                where:{
+                    gatewayOrderId:apiInput.razorpay_subscription_id,
+                },
+                update:{                    
+                    status:"SUCCESS",                    
+                    gatewayPaymentId:apiInput.razorpay_payment_id,
+                    gatewaySignature:apiInput.razorpay_signature
+                },
+                create:{
+                    userId,
+                    subscriptionId:apiInput.internal_subscription_id,
+                    amount:concernedSubscription.plan.price,
+                    status:"SUCCESS",
+                    gatewayOrderId:apiInput.razorpay_subscription_id,
+                    gatewayPaymentId:apiInput.razorpay_payment_id,
+                    gatewaySignature:apiInput.razorpay_signature 
+                }
+            });
+            /* await tx.payment.create({
                 data:{
                     userId,
                     subscriptionId:apiInput.internal_subscription_id,
@@ -166,7 +185,7 @@ export const registerNewSubscriptionPlan = async (apiInput:VerifySubscriptionInp
                     gatewayPaymentId:apiInput.razorpay_payment_id,
                     gatewaySignature:apiInput.razorpay_signature
                 }
-            });
+            }); */
             return lastGatewaySubscriptionId;
         });
         return lastGatewaySubscriptionId;

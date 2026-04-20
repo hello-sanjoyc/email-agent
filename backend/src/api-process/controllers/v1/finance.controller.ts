@@ -122,10 +122,7 @@ export const verifySubscription = async (req:Request,res:Response,next:NextFunct
     }
 }
 export const respondToWebhook = async (req:Request,res:Response,next:NextFunction) => {
-    try{
-        logger.info("[webhook-request] data received",{
-            data:req.body
-        });
+    try{        
         const requestSignature = req.headers["x-razorpay-signature"] as string;
         const razorpaySecret = env.RAZORPAY_WEBHOOK_SECRET;
         const rawBody = req.rawBody;
@@ -137,10 +134,7 @@ export const respondToWebhook = async (req:Request,res:Response,next:NextFunctio
         const razorpayWebhookProcessingQueue = getRazorpayWebhookProcessingQueue();
         await razorpayWebhookProcessingQueue.add("razorpay-webhook-processing",payloadObject);
         return res.status(200).send("OK");       
-    }catch(err){
-        logger.error("[webhook request] falied",{
-            data:err instanceof Error? err.message:"",
-        });
+    }catch(err){        
         next(err);
     }
 }

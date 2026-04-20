@@ -17,14 +17,24 @@ const razorpayWebhookProcessor =async (job:Job<RazorpayJobPayload>):Promise<void
     try{
         const event = job.data.event;
         logger.info(`[RAZORPAY WEBHOOK PROCESSING] concerned event is: ${event} with job id: ${job.id}`);
-        const rzpSubscriptionId = job.data.payload.subscription.entity.id;
+        let rzpSubscriptionId;
+        let rzpPaymentId;
+        let rzpSubscriptionStartSeconds;
+        let rzpSubscriptionEndSeconds;
+        let rzpPrice;
+        /* const rzpSubscriptionId = job.data.payload.subscription.entity.id;
         const rzpPaymentId = job.data.payload.payment?.entity.id;
         const rzpSubscriptionStartSeconds = job.data.payload.subscription.entity.current_start;
         const rzpSubscriptionEndSeconds = job.data.payload.subscription.entity.current_end;
-        const rzpPrice = job.data.payload.payment?.entity.amount;
+        const rzpPrice = job.data.payload.payment?.entity.amount; */
         const emailSendingQueue = getEmailSendingQueue();
         switch(event){
             case RazorpayWebhookEvent.SUBSCRIPTION_CHARGED:
+                rzpSubscriptionId = job.data.payload.subscription.entity.id;
+                rzpPaymentId = job.data.payload.payment?.entity.id;
+                rzpSubscriptionStartSeconds = job.data.payload.subscription.entity.current_start;
+                rzpSubscriptionEndSeconds = job.data.payload.subscription.entity.current_end;
+                rzpPrice = job.data.payload.payment?.entity.amount;
                 if(!rzpPrice){
                     throw new Error("Invalid Price");
                 }
@@ -55,6 +65,7 @@ const razorpayWebhookProcessor =async (job:Job<RazorpayJobPayload>):Promise<void
                 });                
                 break;
             case RazorpayWebhookEvent.SUBSCRIPTION_ACTIVATED:
+                rzpSubscriptionId = job.data.payload.subscription.entity.id;                                                               
                 const activatedSubscriptionData = await handleRazorpayActivatedEvent(rzpSubscriptionId);
                 await emailSendingQueue.add("email-sending",{
                     to:activatedSubscriptionData.user.email,
@@ -65,6 +76,7 @@ const razorpayWebhookProcessor =async (job:Job<RazorpayJobPayload>):Promise<void
                 });                
                 break;
             case RazorpayWebhookEvent.SUBSCRIPTION_HALTED:
+                rzpSubscriptionId = job.data.payload.subscription.entity.id;                
                 const rzpSub = (await razorpay.subscriptions.fetch(rzpSubscriptionId));
                 const razorpayBillingUrl = rzpSub.short_url || `${env.FRONTEND_URL}/billings`
                 const haltedSubscriptionData = await handleRazorpayHaltedEvent(rzpSubscriptionId);                
@@ -75,6 +87,7 @@ const razorpayWebhookProcessor =async (job:Job<RazorpayJobPayload>):Promise<void
                 }); 
                 break;
             case RazorpayWebhookEvent.SUBSCRIPTION_CANCELLED:
+                rzpSubscriptionId = job.data.payload.subscription.entity.id;                
                 const cancelledSubscriptionData = await handleRazorpayCancelledEvent(rzpSubscriptionId);
                 await emailSendingQueue.add(
                     'email-sending',
