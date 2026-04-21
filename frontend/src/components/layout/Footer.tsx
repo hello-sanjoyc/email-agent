@@ -12,10 +12,11 @@ export default function Footer() {
     const supportLinks = [
         { label: "Terms & Conditions", to: "/terms-and-conditions" },
         { label: "Privacy Policy", to: "/privacy-policy" },
+        { label: "Data Policy", to: "/data-policy" },
     ];
 
     return (
-        <footer className="w-full bg-[#6b46ff] text-white font-sans">
+        <footer className="w-full bg-[#2467d5] text-white font-sans">
             <div className="max-w-7xl mx-auto px-8 py-16">
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start text-center lg:text-left">
                     {/* Brand + contact */}
@@ -24,7 +25,7 @@ export default function Footer() {
                             <img
                                 src="/assets/images/logo_white.png"
                                 alt="Logo"
-                                className="h-16 sm:h-24 w-auto"
+                                className="h-12 w-auto"
                             />
                         </div>
 
@@ -39,7 +40,10 @@ export default function Footer() {
                         <ul className="space-y-3 text-white/90">
                             {usefulLinks.map((link) => (
                                 <li key={link.label}>
-                                    <Link to={link.to} className="hover:underline">
+                                    <Link
+                                        to={link.to}
+                                        className="hover:underline"
+                                    >
                                         {link.label}
                                     </Link>
                                 </li>
@@ -53,7 +57,10 @@ export default function Footer() {
                         <ul className="space-y-3 text-white/90">
                             {supportLinks.map((link) => (
                                 <li key={link.label}>
-                                    <Link to={link.to} className="hover:underline">
+                                    <Link
+                                        to={link.to}
+                                        className="hover:underline"
+                                    >
                                         {link.label}
                                     </Link>
                                 </li>
@@ -63,25 +70,16 @@ export default function Footer() {
 
                     {/* CTA column */}
                     <div className="space-y-6">
-                        <h4 className="text-xl font-bold">Let's Try Out</h4>
+                        <h4 className="text-xl font-bold">Available Soon</h4>
 
                         <div className="flex flex-col items-center lg:items-start gap-4">
-                            {/* <button className="px-4 py-3 rounded-lg bg-white text-[#6b46ff] font-semibold shadow-sm border border-white/30 flex items-center gap-3">
-                                <svg
-                                    className="w-6 h-6"
-                                    viewBox="0 0 24 24"
-                                    fill="currentColor"
-                                >
-                                    <rect
-                                        x="3"
-                                        y="5"
-                                        width="14"
-                                        height="14"
-                                        rx="2"
-                                    />
-                                </svg>
-                                <span className="text-sm">App Store</span>
-                            </button> */}
+                            <button className="w-44 sm:w-48 h-auto p-2.5 rounded-lg bg-white shadow-sm border border-white/30 flex items-center gap-3">
+                                <img
+                                    src="/assets/images/appstore_blue.png"
+                                    alt="Apple App Store"
+                                    className="object-contain"
+                                />
+                            </button>
 
                             <button className="w-44 sm:w-48 h-auto p-2.5 rounded-lg bg-white shadow-sm border border-white/30 flex items-center gap-3">
                                 <img
@@ -96,7 +94,7 @@ export default function Footer() {
             </div>
 
             {/* Bottom copyright strip */}
-            <div className="w-full bg-[#5a36e0]">
+            <div className="w-full bg-[#1047a0]">
                 <div className="max-w-7xl mx-auto px-8 py-4 flex flex-col gap-2 text-center lg:text-left lg:flex-row justify-between items-center text-white/90 text-sm">
                     <div>© Copyright 2026. All rights reserved.</div>
                     <div>

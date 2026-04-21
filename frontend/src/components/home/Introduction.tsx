@@ -35,13 +35,13 @@ export default function Introduction() {
                     data-aos-duration="1000"
                 >
                     <div
-                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-[#644ae9] text-xs font-bold uppercase tracking-wider mb-6"
+                        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-purple-500/20 text-[#2467d5] text-xs font-bold uppercase tracking-wider mb-6"
                         data-aos="fade-down"
                         data-aos-delay="50"
                     >
                         <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#644ae9] opacity-75" />
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#644ae9]" />
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#2467d5] opacity-75" />
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#2467d5]" />
                         </span>
                         Next-Gen Intelligence
                     </div>
@@ -55,7 +55,7 @@ export default function Introduction() {
                             Stop{" "}
                         </span>
                         Managing Emails. Let{" "}
-                        <span className="md:inline text-4xl sm:text-5xl md:text-[96px] text-[#644ae9]">
+                        <span className="md:inline text-4xl sm:text-5xl md:text-[96px] text-[#2467d5]">
                             AI
                         </span>{" "}
                         Do It.
@@ -78,7 +78,7 @@ export default function Introduction() {
                     >
                         <button
                             onClick={scrollToContact}
-                            className="bg-[#644ae9] text-white px-8 py-4 rounded-full text-lg font-bold shadow-2xl shadow-purple-500/30 hover:scale-105 transition-transform"
+                            className="bg-[#2467d5] text-white px-8 py-4 rounded-full text-lg font-bold shadow-2xl shadow-blue-500/30 hover:scale-105 transition-transform"
                         >
                             Start Free Trial
                         </button>
@@ -97,7 +97,7 @@ export default function Introduction() {
                     data-aos-duration="1500"
                 >
                     {/* background purple blob */}
-                    <div className="absolute -right-12 w-80 h-80 rounded-full bg-[#6b46ff]/20 pointer-events-none blur-3xl" />
+                    <div className="absolute -right-12 w-80 h-80 rounded-full bg-[#2467d5]/20 pointer-events-none blur-3xl" />
 
                     {/* left icon */}
                     <div
@@ -174,7 +174,7 @@ export default function Introduction() {
                                 aria-label={`Go to slide ${i + 1}`}
                                 className={`rounded-full transition-all duration-300 ${
                                     i === index
-                                        ? "h-3.5 w-3.5 bg-[#6b46ff]"
+                                        ? "h-3.5 w-3.5 bg-[#2467d5]"
                                         : "h-2.5 w-2.5 bg-slate-300"
                                 }`}
                             />

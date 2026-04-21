@@ -139,8 +139,8 @@ export default function NavBar() {
                     >
                         <img
                             src="/assets/images/logo.png"
-                            alt="Email Agent logo"
-                            className="h-9 sm:h-12 md:h-16 lg:h-20 w-auto max-w-[140px] sm:max-w-none"
+                            alt="EMA logo"
+                            className="h-12 w-auto max-w-[140px] sm:max-w-none"
                         />
                     </NavLink>
 
@@ -153,7 +153,7 @@ export default function NavBar() {
                             className={({ isActive }) =>
                                 `rounded-full px-4 py-1 font-medium transition-all duration-300 ${
                                     isActive && !activeSection
-                                        ? "bg-violet-100 text-violet-700"
+                                        ? "bg-blue-100 text-blue-700"
                                         : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                                 }`
                             }
@@ -166,7 +166,7 @@ export default function NavBar() {
                             onClick={() => navigateToSection("features")}
                             className={`rounded-full px-4 py-1 font-medium transition-all duration-300 ${
                                 activeSection === "features"
-                                    ? "bg-violet-100 text-violet-700"
+                                    ? "bg-blue-100 text-blue-700"
                                     : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                             }`}
                         >
@@ -178,7 +178,7 @@ export default function NavBar() {
                             className={({ isActive }) =>
                                 `rounded-full px-4 py-1 font-medium transition-all duration-300 ${
                                     isActive
-                                        ? "bg-violet-100 text-violet-700"
+                                        ? "bg-blue-100 text-blue-700"
                                         : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                                 }`
                             }
@@ -191,7 +191,7 @@ export default function NavBar() {
                             onClick={() => navigateToSection("faq")}
                             className={`rounded-full px-4 py-1 font-medium transition-all duration-300 ${
                                 activeSection === "faq"
-                                    ? "bg-violet-100 text-violet-700"
+                                    ? "bg-blue-100 text-blue-700"
                                     : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                             }`}
                         >
@@ -203,7 +203,7 @@ export default function NavBar() {
                             onClick={() => navigateToSection("contact")}
                             className={`rounded-full px-4 py-1 font-medium transition-all duration-300 ${
                                 activeSection === "contact"
-                                    ? "bg-violet-100 text-violet-700"
+                                    ? "bg-blue-100 text-blue-700"
                                     : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                             }`}
                         >
@@ -298,7 +298,7 @@ export default function NavBar() {
                             >
                                 <img
                                     src="/assets/images/logo.png"
-                                    alt="Email Agent logo"
+                                    alt="EMA logo"
                                     className="h-12 w-auto"
                                 />
                             </NavLink>
@@ -335,7 +335,7 @@ export default function NavBar() {
                                 className={({ isActive }) =>
                                     `rounded-lg px-4 py-3 text-base font-medium transition ${
                                         isActive && !activeSection
-                                            ? "bg-violet-100 text-violet-700"
+                                            ? "bg-blue-100 text-blue-700"
                                             : "text-slate-800 hover:bg-slate-100"
                                     }`
                                 }
@@ -348,7 +348,7 @@ export default function NavBar() {
                                 onClick={() => navigateToSection("features")}
                                 className={`rounded-lg px-4 py-3 text-base font-medium transition text-left ${
                                     activeSection === "features"
-                                        ? "bg-violet-100 text-violet-700"
+                                        ? "bg-blue-100 text-blue-700"
                                         : "text-slate-800 hover:bg-slate-100"
                                 }`}
                             >
@@ -361,7 +361,7 @@ export default function NavBar() {
                                 className={({ isActive }) =>
                                     `rounded-lg px-4 py-3 text-base font-medium transition ${
                                         isActive
-                                            ? "bg-violet-100 text-violet-700"
+                                            ? "bg-blue-100 text-blue-700"
                                             : "text-slate-800 hover:bg-slate-100"
                                     }`
                                 }
@@ -374,7 +374,7 @@ export default function NavBar() {
                                 onClick={() => navigateToSection("faq")}
                                 className={`rounded-lg px-4 py-3 text-base font-medium transition text-left ${
                                     activeSection === "faq"
-                                        ? "bg-violet-100 text-violet-700"
+                                        ? "bg-blue-100 text-blue-700"
                                         : "text-slate-800 hover:bg-slate-100"
                                 }`}
                             >
@@ -386,7 +386,7 @@ export default function NavBar() {
                                 onClick={() => navigateToSection("contact")}
                                 className={`rounded-lg px-4 py-3 text-base font-medium transition text-left ${
                                     activeSection === "contact"
-                                        ? "bg-violet-100 text-violet-700"
+                                        ? "bg-blue-100 text-blue-700"
                                         : "text-slate-800 hover:bg-slate-100"
                                 }`}
                             >
@@ -398,7 +398,7 @@ export default function NavBar() {
                         <div className="mx-auto px-4 py-4">
                             <button
                                 onClick={scrollToContact}
-                                className="w-full rounded-xl bg-violet-600 px-4 py-3 font-semibold text-white transition hover:bg-violet-700"
+                                className="w-full rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white transition hover:bg-blue-700"
                             >
                                 Get Started
                             </button>
@@ -410,7 +410,7 @@ export default function NavBar() {
             <button
                 onClick={scrollToTop}
                 aria-label="Go to top"
-                className={`fixed z-50 right-4 bottom-6 flex items-center justify-center h-12 w-12 rounded-full text-white shadow-lg transition-opacity duration-300 ${scrolled ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"} bg-purple-600 hover:bg-purple-700`}
+                className={`fixed z-50 right-4 bottom-6 flex items-center justify-center h-12 w-12 rounded-full text-white shadow-lg transition-opacity duration-300 ${scrolled ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"} bg-blue-600 hover:bg-blue-700`}
             >
                 <svg
                     className="w-6 h-6"

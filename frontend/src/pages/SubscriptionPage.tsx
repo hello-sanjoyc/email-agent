@@ -28,11 +28,11 @@ export default function SubscriptionPage() {
     useEffect(() => {
         const fetchBillingData = async () => {
             try {
-                const plansRes = await api.get<ApiResponse<SubscriptionPlanData[]>>(
-                    "/api/v1/finance/subscription-plans",
-                );
+                const plansRes = await api.get<
+                    ApiResponse<SubscriptionPlanData[]>
+                >("/api/v1/finance/subscription-plans");
                 setPlans(plansRes.data.data);
-                if(isAuthenticatedUser){
+                if (isAuthenticatedUser) {
                     const [subRes, userRes] = await Promise.all([
                         api.get<ApiResponse<ActiveSubscriptionPlanData>>(
                             "/api/v1/finance/active-subscription-plan",
@@ -40,10 +40,10 @@ export default function SubscriptionPage() {
                         api.get<ApiResponse<UserProfileData>>(
                             "/api/v1/user/profile",
                         ),
-                    ]);                
+                    ]);
                     setActiveSub(subRes.data.data);
                     setUser(userRes.data.data);
-                }                
+                }
             } catch (err) {
                 console.error(err);
                 toast.error("Error loading billing data");
@@ -103,7 +103,7 @@ export default function SubscriptionPage() {
                         toast.error("Error during payment verification");
                     }
                 },
-                theme: { color: "#644ae9" },
+                theme: { color: "#2467d5" },
                 modal: {
                     onDismiss: () => setLoading(false),
                 },
@@ -125,7 +125,7 @@ export default function SubscriptionPage() {
         return (
             <MainLayout>
                 <div className="min-h-[80vh] w-full flex flex-col items-center justify-center gap-4">
-                    <div className="w-9 h-9 rounded-full border-2 border-purple-100 border-t-[#644ae9] animate-spin" />
+                    <div className="w-9 h-9 rounded-full border-2 border-purple-100 border-t-[#2467d5] animate-spin" />
                     <p className="text-slate-400 text-xs tracking-widest font-mono uppercase">
                         Loading plans
                     </p>
@@ -138,21 +138,21 @@ export default function SubscriptionPage() {
         <MainLayout>
             <div className="relative w-full pb-20 overflow-hidden">
                 <div className="absolute top-8 left-1/2 -translate-x-1/2 w-[70rem] h-[36rem] bg-gradient-to-b from-purple-500/10 to-transparent rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute -top-28 right-0 w-72 h-72 bg-[#644ae9]/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -top-28 right-0 w-72 h-72 bg-[#2467d5]/10 rounded-full blur-3xl pointer-events-none" />
                 <div className="max-w-6xl mx-auto px-6 relative z-10">
                     {/* Header */}
                     <div className="text-center pt-12 pb-14">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-[#644ae9] text-xs font-bold uppercase tracking-wider mb-6">
+                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-purple-500/20 text-[#2467d5] text-xs font-bold uppercase tracking-wider mb-6">
                             <span className="relative flex h-2 w-2">
-                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#644ae9] opacity-75" />
-                                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#644ae9]" />
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#2467d5] opacity-75" />
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#2467d5]" />
                             </span>
                             Choose your plan
                         </div>
 
                         <h1 className="text-5xl font-extrabold text-slate-900 tracking-tight leading-tight mb-4">
-                            Email Agent <br />
-                            <span className="text-[#644ae9]">Premium</span>
+                            EMA <br />
+                            <span className="text-[#2467d5]">Premium</span>
                         </h1>
 
                         <p className="text-base text-slate-500 max-w-sm mx-auto leading-relaxed">
@@ -161,8 +161,8 @@ export default function SubscriptionPage() {
                         </p>
 
                         {activeSub && (
-                            <div className="inline-flex items-center gap-2 mt-6 bg-purple-50 border border-purple-200 rounded-xl px-4 py-2">
-                                <div className="w-2 h-2 rounded-full bg-[#644ae9]" />
+                            <div className="inline-flex items-center gap-2 mt-6 bg-blue-50 border border-purple-200 rounded-xl px-4 py-2">
+                                <div className="w-2 h-2 rounded-full bg-[#2467d5]" />
                                 <span className="text-sm text-purple-700 font-mono">
                                     Active plan
                                 </span>
@@ -174,13 +174,13 @@ export default function SubscriptionPage() {
                     <div className="rounded-4xl border border-purple-100 bg-white/90 backdrop-blur-sm shadow-sm p-5 md:p-8">
                         {/* Billing interval toggle */}
                         <div className="flex justify-end mb-5">
-                            <div className="inline-flex items-center bg-purple-50/80 border border-purple-100 rounded-xl p-1 gap-1 shadow-sm">
+                            <div className="inline-flex items-center bg-blue-50/80 border border-purple-100 rounded-xl p-1 gap-1 shadow-sm">
                                 <button
                                     onClick={() => setBillingTab("MONTH")}
                                     className={`px-5 py-2 rounded-lg text-sm font-medium transition-all
                     ${
                         billingTab === "MONTH"
-                            ? "bg-[#644ae9] text-white shadow-md shadow-purple-500/20"
+                            ? "bg-[#2467d5] text-white shadow-md shadow-blue-500/20"
                             : "text-slate-500 hover:text-slate-700"
                     }`}
                                 >
@@ -191,7 +191,7 @@ export default function SubscriptionPage() {
                                     className={`px-5 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2
                     ${
                         billingTab === "YEAR"
-                            ? "bg-[#644ae9] text-white shadow-md shadow-purple-500/20"
+                            ? "bg-[#2467d5] text-white shadow-md shadow-blue-500/20"
                             : "text-slate-500 hover:text-slate-700"
                     }`}
                                 >
@@ -201,7 +201,7 @@ export default function SubscriptionPage() {
                     ${
                         billingTab === "YEAR"
                             ? "bg-white/20 text-white"
-                            : "bg-purple-100 text-[#644ae9]"
+                            : "bg-blue-100 text-[#2467d5]"
                     }`}
                                     >
                                         Save 20%
@@ -219,7 +219,9 @@ export default function SubscriptionPage() {
                                     isCurrent={activeSub?.planId === plan.id}
                                     onSelect={handlePlanSelect}
                                     isAuthenticated={isAuthenticatedUser}
-                                    isUnderASubscription={activeSub?true:false}
+                                    isUnderASubscription={
+                                        activeSub ? true : false
+                                    }
                                 />
                             ))}
                         </div>

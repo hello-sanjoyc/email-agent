@@ -3,8 +3,8 @@ import { useState } from "react";
 export default function Faq() {
     const faqs = [
         {
-            q: "What does the AI Email Agent do?",
-            a: "The AI Email Agent automatically reads your emails and turns them into actions like creating tasks, scheduling meetings, drafting replies, and forwarding messages—without manual effort.",
+            q: "What does the AI EMA do?",
+            a: "The AI EMA automatically reads your emails and turns them into actions like creating tasks, scheduling meetings, drafting replies, and forwarding messages—without manual effort.",
         },
         {
             q: "Does the AI send emails on my behalf?",
@@ -61,7 +61,7 @@ export default function Faq() {
                     data-aos-duration="900"
                 >
                     <h2 className="text-4xl md:text-5xl font-extrabold mb-2">
-                        <span className="text-[#644ae9]">FAQ</span>
+                        <span className="text-[#2467d5]">FAQ</span>
 
                         <span className="text-black">
                             {" - "}Frequently Asked Questions

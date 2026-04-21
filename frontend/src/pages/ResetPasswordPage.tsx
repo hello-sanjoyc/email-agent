@@ -76,14 +76,14 @@ export default function ResetPasswordPage() {
         } catch (err) {
             setFormState("idle");
             let msg;
-            if(err instanceof AxiosError){
+            if (err instanceof AxiosError) {
                 msg =
-                err?.response?.data?.message ??
-                "Something went wrong. Please try again.";                
-            }else {
+                    err?.response?.data?.message ??
+                    "Something went wrong. Please try again.";
+            } else {
                 msg = "Unexpected Error";
             }
-            toast.error(msg);      
+            toast.error(msg);
         }
     };
 
@@ -105,14 +105,15 @@ export default function ResetPasswordPage() {
                         alt="Logo"
                         className="h-14 w-auto"
                         onError={(e) => {
-                            (e.currentTarget as HTMLImageElement).style.display =
-                                "none";
+                            (
+                                e.currentTarget as HTMLImageElement
+                            ).style.display = "none";
                         }}
                     />
                 </div>
 
                 {/* Card */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl shadow-purple-200/60 border border-purple-100 px-8 py-10">
+                <div className="bg-white/90 backdrop-blur-sm rounded-3xl shadow-xl shadow-blue-200/60 border border-purple-100 px-8 py-10">
                     {formState === "success" ? (
                         /* ── Success state ── */
                         <div className="flex flex-col items-center text-center gap-5 py-4">
@@ -145,7 +146,7 @@ export default function ResetPasswordPage() {
                         /* ── Form state ── */
                         <>
                             <div className="mb-8 text-center">
-                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-[#644ae9] text-xs font-bold uppercase tracking-wider mb-4">
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-purple-500/20 text-[#644ae9] text-xs font-bold uppercase tracking-wider mb-4">
                                     <span className="w-1.5 h-1.5 rounded-full bg-[#644ae9] inline-block" />
                                     Secure Reset
                                 </div>
@@ -173,7 +174,7 @@ export default function ResetPasswordPage() {
                                             }
                                             placeholder="Min. 8 characters"
                                             required
-                                            className="w-full px-4 py-3 pr-11 rounded-xl border border-purple-100 bg-purple-50/40 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#644ae9]/30 focus:border-[#644ae9] transition"
+                                            className="w-full px-4 py-3 pr-11 rounded-xl border border-purple-100 bg-blue-50/40 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#644ae9]/30 focus:border-[#644ae9] transition"
                                         />
                                         <button
                                             type="button"
@@ -233,7 +234,7 @@ export default function ResetPasswordPage() {
                                                                 ? strengthColor[
                                                                       strength
                                                                   ]
-                                                                : "bg-purple-100"
+                                                                : "bg-blue-100"
                                                         }`}
                                                     />
                                                 ))}
@@ -263,7 +264,9 @@ export default function ResetPasswordPage() {
                                     <div className="relative">
                                         <input
                                             type={
-                                                showConfirm ? "text" : "password"
+                                                showConfirm
+                                                    ? "text"
+                                                    : "password"
                                             }
                                             value={confirmPassword}
                                             onChange={(e) =>
@@ -273,7 +276,7 @@ export default function ResetPasswordPage() {
                                             }
                                             placeholder="Re-enter your password"
                                             required
-                                            className={`w-full px-4 py-3 pr-11 rounded-xl border bg-purple-50/40 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#644ae9]/30 transition ${
+                                            className={`w-full px-4 py-3 pr-11 rounded-xl border bg-blue-50/40 text-slate-800 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#644ae9]/30 transition ${
                                                 confirmPassword.length > 0 &&
                                                 confirmPassword !== newPassword
                                                     ? "border-red-300 focus:border-red-400"

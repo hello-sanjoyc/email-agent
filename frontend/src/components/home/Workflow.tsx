@@ -9,7 +9,7 @@ export default function Workflow() {
                     data-aos-duration="1000"
                 >
                     <h2 className="text-5xl font-extrabold mb-2">
-                        <span className="text-[#644ae9]">Features</span> that
+                        <span className="text-[#2467d5]">Features</span> that
                         makes app different!
                     </h2>
                     <p className="text-slate-600 max-w-2xl mx-auto">
