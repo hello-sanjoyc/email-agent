@@ -25,7 +25,7 @@ export const initEmailSenderWorker = () => {
         sendEmail,
         {
             connection:redisConnection,
-            concurrency: 5
+            concurrency: 2
         }
     );
 

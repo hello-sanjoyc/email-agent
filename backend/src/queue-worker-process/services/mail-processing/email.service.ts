@@ -147,7 +147,7 @@ export class EmailService {
         const connection = await imaps.connect(config as imaps.ImapSimpleOptions);
         await connection.openBox('INBOX');
 
-        let sinceDate = this.formatImapDate(input.subscription_date);
+        /* let sinceDate = this.formatImapDate(input.subscription_date);
         const searchCriteria = ['UNSEEN', ['SINCE', sinceDate]];
         const fetchOptions = {
             bodies: ["HEADER.FIELDS (FROM TO SUBJECT DATE MESSAGE-ID)", ""],
@@ -156,12 +156,51 @@ export class EmailService {
         };
 
         const messages = (await connection.search(searchCriteria, fetchOptions)).reverse();
-        const messagesArray = await Promise.all(messages.slice(0, input.readCount).map(async (msg) => {
+        const messagesArray = await Promise.all(messages.slice(0, input.readCount).map(async (msg) => { */
+        let sinceDate = this.formatImapDate(input.subscription_date);
+        const searchCriteria = ['UNSEEN', ['SINCE', sinceDate]];
+        
+        // STEP 1: Lightweight search - Ask ONLY for UIDs
+        // By not including '""' in bodies, we prevent downloading the massive email payloads
+        const uidFetchOptions = {
+            bodies: ['HEADER.FIELDS (MESSAGE-ID)'], 
+            struct: false,
+            markSeen: false
+        };
+
+        const unseenMessages = await connection.search(searchCriteria, uidFetchOptions);
+
+        // If nothing is found, return early to save processing time
+        if (unseenMessages.length === 0) {
+            return {
+                readMessageResponse: [],
+                liveImapConnection: connection
+            };
+        }
+
+        // STEP 2: Slice the lightweight array to respect the user's maxEmailsPerRun quota
+        const messagesToProcess = unseenMessages.reverse().slice(0, input.readCount);
+
+        // Extract the IMAP UIDs for just those specific messages
+        const uidsToFetch = messagesToProcess.map(msg => msg.attributes.uid);
+
+        // STEP 3: Heavy fetch - Now ask for the full body (""), but ONLY for the sliced UIDs
+        const fullFetchOptions = {
+            bodies: ["HEADER.FIELDS (FROM TO SUBJECT DATE MESSAGE-ID)", ""],
+            struct: true,
+            markSeen: false
+        };
+
+        // Execute the heavy search explicitly targeting the UIDs
+        const fullMessages = (await connection.search([['UID', uidsToFetch.join(',')]], fullFetchOptions)).reverse();
+
+        // Map over fullMessages (which is now guaranteed to be no larger than input.readCount)
+        const messagesArray = await Promise.all(fullMessages.map(async (msg) => {
             const headerPart = msg.parts.find(p => p.which.includes('HEADER'));
             const textPart = msg.parts.find(p => p.which === '');
             const header = headerPart?.body || {};
             const parsed = await simpleParser(textPart?.body || '');
-
+            const attachmentSafeLimit = 5 * 1024 * 1024;
             return {
                 messageID: this.getHeaderString(header['message-id']) || '',
                 from: this.extractEmail(this.getHeaderString(header.from)) || '',
@@ -173,12 +212,23 @@ export class EmailService {
                 forward_html: parsed.html || '',
                 internetMessageId:"",
                 senderUtcOffset: this.extractUtcOffset(this.getHeaderString(header.date)),
-                attachments: (parsed.attachments || []).map(att => ({
+                attachments: (parsed.attachments || []).reduce((safeAttachments,att) => {
+                    if(att.size && att.size <= attachmentSafeLimit){
+                        safeAttachments.push({
+                            filename: att.filename,
+                            content: att.content,
+                            contentType: att.contentType,
+                            cid: att.cid
+                        });
+                    }
+                    return safeAttachments;
+                },[] as any[])
+                /* attachments: (parsed.attachments || []).map(att => ({
                     filename: att.filename,
                     content: att.content,
                     contentType: att.contentType,
                     cid: att.cid
-                }))
+                })) */
             };
         }));        
         return{

@@ -358,10 +358,18 @@ export const processEmail = async (payload:EmailProcessingPayload):Promise<Proce
             data:actionResultBag
         }      
     }catch(err){
+        let safeErrorMessage= "unknown";
+        if(err instanceof Error){
+            if((err as any).isAxiosError){
+                safeErrorMessage = `API Error: ${(err as any).response?.status}- ${(err as any).response?.statusText}`;
+            }else{
+                safeErrorMessage = err.message;
+            }
+        }
         return {
             error:true,
             message:"Internal server error: "+(err instanceof Error?err.message:'unknown'),
-            errorObj: err instanceof Error? err:null,
+            errorObj: new Error(safeErrorMessage),
             data:[]
         }
     }finally{

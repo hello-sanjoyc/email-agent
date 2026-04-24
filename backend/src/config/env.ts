@@ -42,6 +42,8 @@ const envSchema = z.object({
     REDIS_PASSWORD: z.string().default(""),
     ADMIN_EMAIL: z.string().default(""),
     RAZORPAY_WEBHOOK_SECRET: z.string().default(""),
+    DB_LEVEL_ENCRYPTION_KEY:z.string().default(""),
+    IN_TRANSIT_ENCRYPTION_KEY:z.string().default("")
 });
 
 const env = envSchema.parse(process.env);

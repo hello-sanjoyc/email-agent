@@ -8,7 +8,7 @@ import { processEmail } from "./services/mail-processing";
 import { ActionResultBagItem } from "./services/mail-processing/types";
 import { ActionItemPriority } from "../generated/prisma";
 
-const WORKER_CONCURRENCY = 5;
+const WORKER_CONCURRENCY = 2;
 //worker function for the email processing worker
 const processEmailJobs = async (job:Job<EmailProcessingPayload>):Promise<void> => {    
     try{      

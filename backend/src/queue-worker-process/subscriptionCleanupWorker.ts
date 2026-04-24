@@ -35,7 +35,7 @@ export const initSubscriptionCleanupWorker = () => {
         cleanExpiredSubscription,
         {
             connection:redisConnection,
-            concurrency: 5
+            concurrency: 2
         }
     );
 

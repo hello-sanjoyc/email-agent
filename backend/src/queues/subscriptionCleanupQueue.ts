@@ -9,7 +9,7 @@ export const initSubscriptionCleanupQueue = async () => {
             attempts:3,
             backoff:{type:'exponential',delay:5000},
             removeOnComplete:100,
-            removeOnFail:500
+            removeOnFail:200
         }
     });
     subscriptionCleanupQueue.on('error',(err)=>{

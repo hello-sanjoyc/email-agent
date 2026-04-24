@@ -111,7 +111,7 @@ export const initRazorpayWebhookProcessorWorker = () => {
         razorpayWebhookProcessor,
         {
             connection:redisConnection,
-            concurrency:5
+            concurrency:2
         }
     );
     razorpayWebhookProcessorWorker.on('completed',(job)=>{

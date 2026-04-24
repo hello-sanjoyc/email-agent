@@ -10,7 +10,7 @@ export const initEmailProcessingQueue = () => {
             attempts:3,
             backoff:{type:'exponential',delay:5000},
             removeOnComplete:{count:100,age:24 * 3600},
-            removeOnFail:500
+            removeOnFail:200
         }
     });
     emailProcessingQueue.on('error',(err)=>{

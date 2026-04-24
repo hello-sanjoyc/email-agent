@@ -16,10 +16,10 @@ const enqueueEmailJobsForAllUsers = async (plan:"Pro"|"Plus"|"Trial",intervalMS:
     try{
         const planNames = plan !== "Trial" ? [`${plan} Monthly`,`${plan} Yearly`]:[plan];
         let emailProcessingQueue = getEmailProcessingQueue();
+        const allInFlightJobs = await emailProcessingQueue.getJobs(['waiting','active']);
         let skip = 0;
         let hasMore = true;
         while(hasMore && isProcessShuttingDown === false){           
-            const allInFlightJobs = await emailProcessingQueue.getJobs(['waiting','active']);
             const allUsersWithEmailAndCalendarAccounts = await db.user.findMany(
                 {
                     where:{
@@ -135,9 +135,10 @@ const enqueueEmailJobsForAllUsers = async (plan:"Pro"|"Plus"|"Trial",intervalMS:
                 const totalEmailAccountPriorityWeight = eachUser.emailAccounts.reduce((counter,each)=>{
                     return counter + each.priorityWeight;
                 },0);
+                const safeTotalWeight = totalEmailAccountPriorityWeight || 1;
                 const currentBlock = Math.floor(Date.now()/intervalMS);                        
                 const queuAdditionJobs = eachUser.emailAccounts.map((eachEmailAccount)=>{
-                    const throttle = Math.floor((eachEmailAccount.priorityWeight/totalEmailAccountPriorityWeight)*eachUser.subscriptions[0].plan.maxEmailsPerRun);
+                    const throttle = Math.floor((eachEmailAccount.priorityWeight/safeTotalWeight)*eachUser.subscriptions[0].plan.maxEmailsPerRun);
                     let processQuantity = Math.min(throttle,leftQuota);
                     if(processQuantity<= 0){
                         return new Promise((resolve)=>resolve(true))
